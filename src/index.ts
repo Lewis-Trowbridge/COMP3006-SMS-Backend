@@ -4,6 +4,8 @@ import http from 'http'
 import SocketIO from 'socket.io'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from './customer/socketEvents'
 import ItemController from './controllers/ItemController'
+import { connect } from 'mongoose'
+import { URLS } from './constants'
 
 const app: express.Express = express()
 app.use(bodyParser.json({}))
@@ -13,5 +15,7 @@ const server: http.Server = http.createServer(app)
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const io = new SocketIO.Server<ServerToClientEvents, ClientToServerEvents, InterServerEvents>(server)
+
+await connect(URLS.MONGO)
 
 server.listen(9000)

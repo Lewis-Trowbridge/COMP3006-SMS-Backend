@@ -1,9 +1,13 @@
 import express from 'express'
+import bodyParser from 'body-parser'
 import http from 'http'
 import SocketIO from 'socket.io'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from './customer/socketEvents'
+import ItemController from './controllers/ItemController'
 
 const app: express.Express = express()
+app.use(bodyParser.json({}))
+app.use('/items', ItemController)
 
 const server: http.Server = http.createServer(app)
 

@@ -3335,13 +3335,6 @@ jest-message-util@^29.3.1:
     slash "^3.0.0"
     stack-utils "^2.0.3"
 
-jest-mock-extended@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/jest-mock-extended/-/jest-mock-extended-3.0.1.tgz#5f109d5e1da62851ffc9126a01e83cd6470b810b"
-  integrity sha512-RF4Ow8pXvbRuEcCTj56oYHmig5311BSFvbEGxPNYL51wGKGu93MvVQgx0UpFmjqyBXIcElkZo2Rke88kR1iSKQ==
-  dependencies:
-    ts-essentials "^7.0.3"
-
 jest-mock@^29.3.1:
   version "29.3.1"
   resolved "https://registry.yarnpkg.com/jest-mock/-/jest-mock-29.3.1.tgz#60287d92e5010979d01f218c6b215b688e0f313e"
@@ -3733,6 +3726,11 @@ minimist@^1.2.0, minimist@^1.2.6:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.7.tgz#daa1c4d91f507390437c6a8bc01078e7000c4d18"
   integrity sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==
+
+mockingoose@^2.16.2:
+  version "2.16.2"
+  resolved "https://registry.yarnpkg.com/mockingoose/-/mockingoose-2.16.2.tgz#0bd2fae32b3c460241666f8ff889ae68f0b830c0"
+  integrity sha512-6JokLoDoH4yzwnZYLwoynU2lNmbfW7Mcf0d8sF580XI2hqE9Cs5l22iFTjLB51cdxkOvRtjoL84LLVEGmgcwKQ==
 
 mongodb-connection-string-url@^2.5.4:
   version "2.6.0"
@@ -4465,11 +4463,6 @@ tr46@^3.0.0:
   integrity sha512-l7FvfAHlcmulp8kr+flpQZmVwtu7nfRV7NZujtN0OqES8EL4O4e0qqzL0DC5gAvx/ZC/9lk6rhcUwYvkBnBnYA==
   dependencies:
     punycode "^2.1.1"
-
-ts-essentials@^7.0.3:
-  version "7.0.3"
-  resolved "https://registry.yarnpkg.com/ts-essentials/-/ts-essentials-7.0.3.tgz#686fd155a02133eedcc5362dc8b5056cde3e5a38"
-  integrity sha512-8+gr5+lqO3G84KdiTSMRLtuyJ+nTBVRKuCrK4lidMPdVeEp0uqC875uE5NMcaA7YYMN7XsNiFQuMvasF8HT/xQ==
 
 ts-jest@^29.0.3:
   version "29.0.3"

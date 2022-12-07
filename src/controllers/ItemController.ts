@@ -11,7 +11,12 @@ const createPost = async (req: Request, res: Response): Promise<void> => {
     stock
   } = req.body
   const model = await service.create(name, barcode, position, stock)
-  res.status(201).json(model)
+  res.status(201).json(model.toObject({
+    transform: (doc, ret) => {
+      delete ret._id
+    },
+    versionKey: false
+  }))
 }
 
 export {

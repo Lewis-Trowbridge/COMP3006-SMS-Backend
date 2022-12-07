@@ -5,7 +5,7 @@ import SocketIO from 'socket.io'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from './customer/socketEvents'
 import { connect } from 'mongoose'
 import { URLS } from './constants'
-import itemRoutes from './setup/itemRoutes'
+import itemRoutes from './setup/routes/itemRoutes'
 
 const app: express.Express = express()
 app.use(bodyParser.json({}))

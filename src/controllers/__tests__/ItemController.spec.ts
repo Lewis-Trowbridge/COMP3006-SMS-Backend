@@ -25,6 +25,8 @@ describe('ItemController', () => {
     const mockRequest = mock<Request>()
     mockRequest.body = expectedObject
     const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: jest.fn() }) })
+    const expectedResponse = mock<HydratedDocument<IItem>>()
+    mockItemService.prototype?.create.mockResolvedValue(expectedResponse)
     await createPost(mockRequest, mockResponse)
     expect(mockItemService.prototype?.create).toHaveBeenCalledTimes(1)
     expect(mockItemService.prototype?.create).toHaveBeenNthCalledWith(1, expectedName, expectedBarcode, expectedPosition, expectedStock)
@@ -44,6 +46,7 @@ describe('ItemController', () => {
     const mockRequest = mock<Request>()
     mockRequest.body = expectedObject
     const expectedResponse = mock<HydratedDocument<IItem>>()
+    expectedResponse.toObject.mockReturnValue(expectedResponse)
     mockItemService.prototype?.create.mockResolvedValue(expectedResponse)
     const mockJsonFunc = jest.fn()
     const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })

@@ -3,13 +3,13 @@ import bodyParser from 'body-parser'
 import http from 'http'
 import SocketIO from 'socket.io'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from './customer/socketEvents'
-import ItemController from './controllers/ItemController'
 import { connect } from 'mongoose'
 import { URLS } from './constants'
+import itemRoutes from './setup/itemRoutes'
 
 const app: express.Express = express()
 app.use(bodyParser.json({}))
-app.use('/items', ItemController)
+app.use('/items', itemRoutes)
 
 const server: http.Server = http.createServer(app)
 

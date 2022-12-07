@@ -1,11 +1,9 @@
-import { Router } from 'express'
 import ItemService from '../services/staff/ItemService'
+import { Request, Response } from 'express'
 
-const router = Router()
 const service = new ItemService()
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-router.post('/create', async (req, res) => {
+const createPost = async (req: Request, res: Response): Promise<void> => {
   const {
     name,
     position,
@@ -14,6 +12,8 @@ router.post('/create', async (req, res) => {
   } = req.body
   const model = await service.create(name, barcode, position, stock)
   res.status(201).json(model)
-})
+}
 
-export default router
+export {
+  createPost
+}

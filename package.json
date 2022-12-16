@@ -1,13 +1,14 @@
 {
   "name": "COMP3006-SMS-Backend",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "repository": "https://github.com/Lewis-Trowbridge/COMP3006-SMS-Backend.git",
   "author": "Lewis Trowbridge <lewis.trowbridge@students.plymouth.ac.uk>",
   "license": "Unlicensed",
   "private": true,
   "scripts": {
     "build": "tsc",
+    "serve": "node .",
     "prestart": "npm run build",
     "start": "node .",
     "test": "jest",

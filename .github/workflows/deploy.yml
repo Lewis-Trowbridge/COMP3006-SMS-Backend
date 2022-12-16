@@ -36,5 +36,5 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v0
         with:
           service: backend
-          image: europe-west2-docker.pkg.dev/comp3006-sms/comp3000-sms/backend:latest
+          image: europe-west2-docker.pkg.dev/comp3006-sms/comp3006-docker/backend:latest
           region: europe-west1

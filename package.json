@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
+    "serve": "node .",
     "prestart": "npm run build",
     "start": "node .",
     "test": "jest",

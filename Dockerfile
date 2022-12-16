@@ -4,4 +4,6 @@ COPY . .
 
 RUN [ "yarn", "install", "--frozen-lockfile" ]
 
-ENTRYPOINT [ "yarn", "start" ]
+RUN [ "yarn", "build" ]
+
+ENTRYPOINT [ "yarn", "serve" ]

@@ -1,13 +1,8 @@
-import express from 'express'
-import http from 'http'
-import SocketIO from 'socket.io'
-import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from './customer/socketEvents'
+import { connectionPromise, server } from './setup'
+import { URLS } from './constants'
 
-const app: express.Express = express()
-
-const server: http.Server = http.createServer(app)
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const io = new SocketIO.Server<ServerToClientEvents, ClientToServerEvents, InterServerEvents>(server)
-
-server.listen(9000)
+void connectionPromise.then(() => {
+  server.listen(URLS.PORT, () => {
+    console.log('Server now listening on port 9000')
+  })
+})

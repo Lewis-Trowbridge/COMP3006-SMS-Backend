@@ -14,6 +14,25 @@ describe('ItemService', () => {
     expect(actual).toEqual(expectedItem)
   })
 
+  it('gets an item given a barcode', async () => {
+    const expectedBarcode = 'testBarcode'
+    const expectedItem = new Item({ barcode: expectedBarcode })
+    mockingoose(Item).toReturn(expectedItem, 'findOne')
+    const service: ItemService = new ItemService()
+    const actual = await service.findByBarcode(expectedBarcode)
+    expect(actual).toEqual(expectedItem)
+  })
+
+  it('gets an item given a name', async () => {
+    const expectedName = 'testName'
+    const expectedItem = [new Item({ barcode: expectedName })]
+    mockingoose(Item).toReturn(expectedItem, 'find')
+    const service: ItemService = new ItemService()
+    const actual = await service.findByName(expectedName)
+    // Prevent comparison of Mongo internal data
+    expect(JSON.stringify(actual)).toEqual(JSON.stringify(expectedItem))
+  })
+
   it('creates and saves an item', async () => {
     const expectedName = 'name'
     const expectedPosition = 'position'

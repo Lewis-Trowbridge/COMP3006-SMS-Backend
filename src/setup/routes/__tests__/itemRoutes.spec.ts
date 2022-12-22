@@ -32,6 +32,36 @@ describe('Item routes (integration tests)', () => {
     expect(response.status).toBe(201)
     expect(response.body).toEqual(expectedObject)
   }, 10000)
+
+  it('returns HTTP 400 when given a stock number below 0', async () => {
+    const request = supertest(testApp)
+    const invalidValue = -1
+    const testRequestObject = {
+      barcode: 'barcode',
+      name: 'name',
+      position: 'position',
+      stock: invalidValue
+    }
+
+    const expectedError = {
+      errors: [
+        {
+          location: 'body',
+          msg: 'Invalid value',
+          param: 'stock',
+          value: invalidValue
+        }
+      ]
+    }
+    const response = await request.post('/items/create')
+      .type('form')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .send(testRequestObject)
+
+    expect(response.status).toBe(400)
+    expect(response.body).toEqual(expectedError)
+  }, 10000)
 })
 
 afterEach(async () => {

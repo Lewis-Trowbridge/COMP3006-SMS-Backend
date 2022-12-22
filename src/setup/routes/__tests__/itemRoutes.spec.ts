@@ -209,6 +209,63 @@ describe('Item routes (integration tests)', () => {
       expect(response.body).toEqual(expectedErrors)
     }, 10000)
   })
+
+  describe('GET /find-name', () => {
+    it('returns HTTP 200 and valid response with valid data', async () => {
+      const request = supertest(testApp)
+      const expectedItem = await Item.create(validItemObject)
+
+      const response = await request.get('/items/find-name')
+        .query({ name: expectedItem.name })
+        .send()
+
+      expect(response.status).toBe(200)
+      expect(response.body).toEqual({ results: [validItemObject] })
+    }, 10000)
+
+    it('returns HTTP 400 with empty name', async () => {
+      const invalidValue = ''
+      const expectedErrors = {
+        errors: [
+          {
+            location: 'query',
+            msg: 'Invalid value',
+            param: 'name',
+            value: invalidValue
+          }
+        ]
+      }
+
+      const request = supertest(testApp)
+
+      const response = await request.get('/items/find-name')
+        .query({ name: invalidValue })
+        .send()
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(expectedErrors)
+    }, 10000)
+
+    it('returns HTTP 400 with missing name', async () => {
+      const expectedErrors = {
+        errors: [
+          {
+            location: 'query',
+            msg: 'Invalid value',
+            param: 'name'
+          }
+        ]
+      }
+
+      const request = supertest(testApp)
+
+      const response = await request.get('/items/find-name')
+        .send()
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(expectedErrors)
+    }, 10000)
+  })
 })
 
 afterEach(async () => {

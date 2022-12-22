@@ -106,6 +106,45 @@ describe('Item routes (integration tests)', () => {
       expect(response.body).toEqual(expectedError)
     }, 10000)
   })
+
+  it('returns HTTP 400 when values are not supplied', async () => {
+    const request = supertest(testApp)
+    const testRequestObject = {
+    }
+
+    const expectedError = {
+      errors: [
+        {
+          location: 'body',
+          msg: 'Invalid value',
+          param: 'name'
+        },
+        {
+          location: 'body',
+          msg: 'Invalid value',
+          param: 'barcode'
+        },
+        {
+          location: 'body',
+          msg: 'Invalid value',
+          param: 'position'
+        },
+        {
+          location: 'body',
+          msg: 'Invalid value',
+          param: 'stock'
+        }
+      ]
+    }
+    const response = await request.post('/items/create')
+      .type('form')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .send(testRequestObject)
+
+    expect(response.status).toBe(400)
+    expect(response.body).toEqual(expectedError)
+  })
 })
 
 afterEach(async () => {

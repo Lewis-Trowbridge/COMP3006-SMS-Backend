@@ -12,4 +12,8 @@ export default class ItemService {
     stock: number): Promise<HydratedDocument<IItem>> {
     return await Item.create({ barcode, name, position, stock })
   }
+
+  async findByBarcode (barcode: string): Promise<HydratedDocument<IItem> | null> {
+    return await Item.findOne({ barcode })
+  }
 }

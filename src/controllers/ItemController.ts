@@ -32,7 +32,15 @@ const findByBarcodeGet = async (req: Request<{}, {}, {}, { barcode: string }>, r
   }
 }
 
+const findByNameGet = async (req: Request<{}, {}, {}, { name: string }>, res: Response): Promise<void> => {
+  const { name } = req.query
+  const models = await service.findByName(name)
+  const results = models != null ? models.map(model => model.toObject(transformOptions)) : []
+  res.status(200).json({ results })
+}
+
 export {
   createPost,
-  findByBarcodeGet
+  findByBarcodeGet,
+  findByNameGet
 }

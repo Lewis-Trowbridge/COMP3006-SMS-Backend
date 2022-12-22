@@ -1,6 +1,6 @@
 import ItemService from '../../services/staff/ItemService'
 import mocked = jest.mocked
-import { createPost, findByBarcodeGet } from '../ItemController'
+import { createPost, findByBarcodeGet, findByNameGet } from '../ItemController'
 import { mock } from 'jest-mock-extended'
 import { Request, Response } from 'express'
 import { HydratedDocument } from 'mongoose'
@@ -58,6 +58,7 @@ describe('ItemController', () => {
       expect(mockJsonFunc).toHaveBeenNthCalledWith(1, expectedResponse)
     })
   })
+
   describe('findByBarcodeGet', () => {
     it('returns the value when a non-null value is returned from ItemService', async () => {
       const expectedBarcode = 'barcode'
@@ -93,6 +94,42 @@ describe('ItemController', () => {
       expect(mockStatusFunc).toHaveBeenCalledTimes(1)
       expect(mockStatusFunc).toHaveBeenNthCalledWith(1, 404)
       expect(mockJsonFunc).toHaveBeenCalledTimes(0)
+    })
+  })
+  describe('findByNameGet', () => {
+    it('returns the value when a non-null value is returned from ItemService', async () => {
+      const expectedName = 'name'
+      const mockRequest = mock<Request<{}, {}, {}, { name: string }>>({ query: { name: expectedName } })
+      const expectedResponse = [mock<HydratedDocument<IItem>>()]
+      expectedResponse[0].toObject.mockReturnValue(expectedResponse[0])
+      mockItemService.prototype.findByName.mockResolvedValue(expectedResponse)
+      const mockJsonFunc = jest.fn()
+      const mockStatusFunc = jest.fn().mockReturnValue({ json: mockJsonFunc })
+      const mockResponse = mock<Response>({ status: mockStatusFunc })
+
+      await findByNameGet(mockRequest, mockResponse)
+
+      expect(mockStatusFunc).toHaveBeenCalledTimes(1)
+      expect(mockStatusFunc).toHaveBeenNthCalledWith(1, 200)
+      expect(mockJsonFunc).toHaveBeenCalledTimes(1)
+      expect(mockJsonFunc).toHaveBeenNthCalledWith(1, { results: expectedResponse })
+    })
+
+    it('returns an empty list when a null value is returned from ItemService', async () => {
+      const expectedName = 'name'
+      const mockRequest = mock<Request<{}, {}, {}, { name: string }>>({ query: { name: expectedName } })
+      const expectedResponse = null
+      mockItemService.prototype.findByName.mockResolvedValue(expectedResponse)
+      const mockJsonFunc = jest.fn()
+      const mockStatusFunc = jest.fn().mockReturnValue({ json: mockJsonFunc })
+      const mockResponse = mock<Response>({ status: mockStatusFunc })
+
+      await findByNameGet(mockRequest, mockResponse)
+
+      expect(mockStatusFunc).toHaveBeenCalledTimes(1)
+      expect(mockStatusFunc).toHaveBeenNthCalledWith(1, 200)
+      expect(mockJsonFunc).toHaveBeenCalledTimes(1)
+      expect(mockJsonFunc).toHaveBeenNthCalledWith(1, { results: [] })
     })
   })
 })

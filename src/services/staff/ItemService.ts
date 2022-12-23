@@ -1,6 +1,6 @@
 import { HydratedDocument } from 'mongoose'
 import { IItem, Item } from '../../models/staff/Item'
-import escapeStringRegexp from 'escape-string-regexp'
+import escapeStringRegexp from '@esm2cjs/escape-string-regexp'
 
 export default class ItemService {
   async get (id: string): Promise<HydratedDocument<IItem> | null> {

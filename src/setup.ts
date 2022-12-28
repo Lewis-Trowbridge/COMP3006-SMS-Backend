@@ -1,5 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import cors from 'cors'
 import http from 'http'
 import SocketIO from 'socket.io'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from './customer/socketEvents'
@@ -8,6 +9,9 @@ import { URLS } from './constants'
 import itemRoutes from './setup/routes/itemRoutes'
 
 const app: express.Express = express()
+app.use(cors({
+  origin: ['http://localhost:4200', 'https://storage.googleapis.com']
+}))
 app.use(bodyParser.json({}))
 app.use('/items', itemRoutes)
 

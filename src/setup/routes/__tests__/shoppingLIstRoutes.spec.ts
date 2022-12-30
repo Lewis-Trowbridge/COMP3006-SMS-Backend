@@ -4,13 +4,14 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import shoppingListRoutes from '../shoppingListRoutes'
 import supertest from 'supertest'
+import { ShoppingList } from '../../../models/customer/ShoppingList'
 
 const currentTime = new Date(2022, 1, 1)
 
 beforeAll(async () => {
   // Breaks jest function timeouts if nextTick is mocked
-  jest.useFakeTimers({ doNotFake: ['nextTick'] })
-  jest.setSystemTime(currentTime)
+  jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] })
+    .setSystemTime(currentTime)
   await mongoUnit.start()
   await connect(mongoUnit.getUrl())
 }, 30000)
@@ -21,7 +22,7 @@ testApp.use('/lists', shoppingListRoutes)
 
 describe('Shopping list routes (integration tests)', () => {
   describe('POST /new', () => {
-    it('retrieves a new shopping list owned by the current user', async () => {
+    it('returns HTTP 201 and a new shopping list owned by the current user', async () => {
       const mockUserId = 'user'
       const request = supertest(testApp)
       const expectedObject = {
@@ -35,6 +36,52 @@ describe('Shopping list routes (integration tests)', () => {
 
       expect(response.status).toBe(201)
       expect(response.body).toEqual(expectedObject)
+    }, 10000)
+  })
+
+  describe('PATCH /add-editor', () => {
+    it('Returns HTTP 204 and adds a given user to a given list', async () => {
+      const request = supertest(testApp)
+      const mockOwnerId = 'owner'
+      const mockEditorId = 'editor'
+      const testList = await ShoppingList.create({ created: currentTime, ownerId: mockOwnerId })
+      const expectedObject = {
+        listId: testList.id.toString(),
+        userId: mockEditorId
+      }
+
+      const response = await request.patch('/lists/add-editor')
+        .type('form')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .send(expectedObject)
+
+      expect(response.status).toBe(204)
+      expect(testList.editors).toContain(mockEditorId)
+    }, 10000)
+
+    it('returns HTTP 400 and error when given missing ids', async () => {
+      const request = supertest(testApp)
+      const expectedError = {
+        errors: [
+          {
+            location: 'body',
+            msg: 'Invalid value',
+            param: 'userId'
+          },
+          {
+            location: 'body',
+            msg: 'Invalid value',
+            param: 'listId'
+          }
+        ]
+      }
+
+      const response = await request.patch('/lists/add-editor')
+        .send()
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(expectedError)
     }, 10000)
   })
 })

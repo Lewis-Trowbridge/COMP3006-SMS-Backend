@@ -8,6 +8,7 @@ import supertest from 'supertest'
 const currentTime = new Date(2022, 1, 1)
 
 beforeAll(async () => {
+  // Breaks jest function timeouts if nextTick is mocked
   jest.useFakeTimers({ doNotFake: ['nextTick'] })
   jest.setSystemTime(currentTime)
   await mongoUnit.start()

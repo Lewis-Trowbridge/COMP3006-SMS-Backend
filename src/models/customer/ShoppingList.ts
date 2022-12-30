@@ -17,6 +17,7 @@ const ShoppingListSchema = new Schema<IShoppingList>({
   updated: { required: false, type: Date }
 })
 
+// Workaround for Mongoose in Typescript: https://mongoosejs.com/docs/typescript/subdocuments.html
 interface ShoppingListSubdocumentOverride {
   items: Types.DocumentArray<IShoppingListItem>
 }

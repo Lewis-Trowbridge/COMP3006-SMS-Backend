@@ -27,18 +27,35 @@ classDiagram
     } 
     
     class IShoppingList {
-    + IUser owner
-    + string content
-    + updated Date
+    + string ownerId
+    + string[] editors
+    + Date created
+    + Date updated
+    + IShoppingListItem[] items
+    }
+    
+    class IShoppingListItem { 
+    + string item
+    + int quantity
     }
     
     class ShoppingListChanges {
-    + string content
+    + IShoppingListItem[] changes
     }
     
     class ShoppingListService {
+    + create(): IShoppingList
     + list(): IShoppingList[]
     + get(id): IShoppingList
-    + resolve(existingDocument, changes): IShoppingList
+    + addUser(user): bool
+    + resolve(existingDocument, changes): bool
+    }
+    
+    class ShoppingListController {
+    + createPost(req, res)
+    + listGet(req, res)
+    + getGet(req, res)
+    + addUserPost(req, res)
+    + resolvePatch(req, res)
     }
 ```

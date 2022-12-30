@@ -9,7 +9,7 @@ export default class ShoppingListService {
     return await ShoppingList.create({ created: new Date(), ownerId: userId })
   }
 
-  async addEditor (userId: string, listId: Types.ObjectId): Promise<void> {
+  async addEditor (userId: string, listId: Types.ObjectId): Promise<HydratedDocument<IShoppingList>> {
     const list = await ShoppingList.findById(listId)
     if (list == null) {
       throw new Api404Error('List not found.')
@@ -19,6 +19,6 @@ export default class ShoppingListService {
     }
     list.editors.push(userId)
     list.updated = new Date()
-    await list.save()
+    return await list.save()
   }
 }

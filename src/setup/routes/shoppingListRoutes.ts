@@ -8,7 +8,7 @@ const router = Router()
 /* eslint-disable @typescript-eslint/no-misused-promises */
 router.post('/create', newPost)
 
-router.patch('/add-editor', body(['userId', 'listId']).isLength({ min: 1 }).trim(),
+router.post('/add-editor', body(['userId', 'listId']).isLength({ min: 1 }).trim(),
   validateRequest, addEditorPatch)
 
 /* eslint-enable @typescript-eslint/no-misused-promises */

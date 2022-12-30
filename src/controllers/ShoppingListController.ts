@@ -15,7 +15,7 @@ const addEditorPatch = async (req: Request, res: Response): Promise<void> => {
     listId
   } = req.body
   await service.addEditor(userId, listId)
-  res.status(204)
+  res.status(204).send()
 }
 
 export {

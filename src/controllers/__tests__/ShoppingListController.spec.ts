@@ -27,7 +27,7 @@ describe('ShoppingListController', () => {
       expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockShoppingListService.prototype?.new.mockResolvedValue(expectedResponse)
       const mockRequest = mock<Request>()
-      const mockJsonFunc = jest.fn()
+      const mockJsonFunc = jest.fn().mockReturnValue({ send: jest.fn() })
       const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
 
       await newPost(mockRequest, mockResponse)
@@ -60,7 +60,7 @@ describe('ShoppingListController', () => {
       const mockRequest = mock<Request>({
         body: expectedBody
       })
-      const mockStatusFunc = jest.fn()
+      const mockStatusFunc = jest.fn().mockReturnValue({ send: jest.fn() })
       const mockResponse = mock<Response>({ status: mockStatusFunc })
 
       await addEditorPatch(mockRequest, mockResponse)

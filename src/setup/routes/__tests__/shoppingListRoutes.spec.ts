@@ -56,8 +56,10 @@ describe('Shopping list routes (integration tests)', () => {
         .set('Accept', 'application/json')
         .send(expectedObject)
 
+      const updatedList = await ShoppingList.findById(expectedObject.listId)
+
       expect(response.status).toBe(204)
-      expect(testList.editors).toContain(mockEditorId)
+      expect(updatedList?.editors).toContain(mockEditorId)
     }, 10000)
 
     it('returns HTTP 400 and error when given missing ids', async () => {

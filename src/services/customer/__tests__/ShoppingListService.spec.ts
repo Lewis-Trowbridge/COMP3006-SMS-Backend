@@ -1,6 +1,6 @@
 // Mockingoose does not work with ES6 imports: https://stackoverflow.com/questions/70156753/typeerror-0-mockingoose-default-is-not-a-function-mockingooose
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import { IShoppingList, ShoppingList } from '../../../models/customer/ShoppingList'
+import { ShoppingList } from '../../../models/customer/ShoppingList'
 import ShoppingListService from '../ShoppingListService'
 import { mongoExcludeIdsToObjectOptions } from '../../../constants'
 import { Types } from 'mongoose'

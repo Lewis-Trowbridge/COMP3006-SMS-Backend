@@ -38,7 +38,6 @@ export default class ShoppingListService {
       }
     }
     await list.save()
-    console.log(list)
     return await ShoppingList.findById(listId)
   }
 }

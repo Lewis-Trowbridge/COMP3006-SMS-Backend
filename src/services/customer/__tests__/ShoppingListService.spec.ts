@@ -75,7 +75,7 @@ describe('ShoppingListService', () => {
     })
   })
   describe('resolveChanges', () => {
-    it('sends an update query for a single item', async () => {
+    it('updates a single item', async () => {
       const oldItem: IShoppingListItem = {
         _id: new Types.ObjectId(),
         quantity: 1,
@@ -86,30 +86,21 @@ describe('ShoppingListService', () => {
         items: [oldItem],
         ownerId: new Types.ObjectId().toString()
       })
-      const mockUpdate = jest.fn()
       mockingoose(ShoppingList).toReturn(fakeItem, 'findOne')
-        .toReturn(mockUpdate, 'updateOne')
       const newChanges: IShoppingListItem = {
         _id: oldItem._id,
         quantity: 2,
         text: 'newText'
       }
-      const expectedQuery = {
-        'items.$.quantity': newChanges.quantity,
-        'items.$.text': newChanges.text
-      }
 
       const service = new ShoppingListService()
       await service.resolveChanges(oldItem._id.toString(), [newChanges])
+      
+      expect(fakeItem.items[0].toObject()).toEqual(newChanges)
 
-      await ShoppingList.findById(oldItem._id)
-
-      expect(mockUpdate).toHaveBeenCalledTimes(1)
-      const updateQuery = mockUpdate.mock.lastCall[0].getUpdate()
-      expect(updateQuery.$set).toEqual(expectedQuery)
     })
 
-    it('sends an multiple update queries for multiple item', async () => {
+    it('updates multiple items', async () => {
       const oldItem: IShoppingListItem = {
         _id: new Types.ObjectId(),
         quantity: 1,
@@ -121,9 +112,7 @@ describe('ShoppingListService', () => {
         items: [oldItem, oldItem2],
         ownerId: new Types.ObjectId().toString()
       })
-      const mockUpdate = jest.fn()
       mockingoose(ShoppingList).toReturn(fakeItem, 'findOne')
-        .toReturn(mockUpdate, 'updateOne')
       const newChanges: IShoppingListItem = {
         _id: oldItem._id,
         quantity: 2,
@@ -133,21 +122,12 @@ describe('ShoppingListService', () => {
         ...newChanges,
         _id: oldItem2._id
       }
-      const expectedQuery = {
-        'items.$.quantity': newChanges.quantity,
-        'items.$.text': newChanges.text
-      }
 
       const service = new ShoppingListService()
       await service.resolveChanges(oldItem._id.toString(), [newChanges, newChanges2])
 
-      await ShoppingList.findById(oldItem._id)
-
-      expect(mockUpdate).toHaveBeenCalledTimes(2)
-      const updateQuery = mockUpdate.mock.calls[0][0].getUpdate()
-      expect(updateQuery.$set).toEqual(expectedQuery)
-      const updateQuery2 = mockUpdate.mock.calls[1][0].getUpdate()
-      expect(updateQuery2.$set).toEqual(expectedQuery)
+      expect(fakeItem.items[0].toObject()).toEqual(newChanges)
+      expect(fakeItem.items[1].toObject()).toEqual(newChanges2)
     })
   })
 })

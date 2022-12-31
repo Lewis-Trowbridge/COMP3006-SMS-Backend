@@ -108,6 +108,47 @@ describe('ShoppingListService', () => {
       const updateQuery = mockUpdate.mock.lastCall[0].getUpdate()
       expect(updateQuery.$set).toEqual(expectedQuery)
     })
+
+    it('sends an multiple update queries for multiple item', async () => {
+      const oldItem: IShoppingListItem = {
+        _id: new Types.ObjectId(),
+        quantity: 1,
+        text: 'oldText'
+      }
+      const oldItem2: IShoppingListItem = { ...oldItem, _id: new Types.ObjectId() }
+      const fakeItem = await ShoppingList.create({
+        created: new Date(),
+        items: [oldItem, oldItem2],
+        ownerId: new Types.ObjectId().toString()
+      })
+      const mockUpdate = jest.fn()
+      mockingoose(ShoppingList).toReturn(fakeItem, 'findOne')
+        .toReturn(mockUpdate, 'updateOne')
+      const newChanges: IShoppingListItem = {
+        _id: oldItem._id,
+        quantity: 2,
+        text: 'newText'
+      }
+      const newChanges2: IShoppingListItem = {
+        ...newChanges,
+        _id: oldItem2._id
+      }
+      const expectedQuery = {
+        'items.$.quantity': newChanges.quantity,
+        'items.$.text': newChanges.text
+      }
+
+      const service = new ShoppingListService()
+      await service.resolveChanges(oldItem._id.toString(), [newChanges, newChanges2])
+
+      await ShoppingList.findById(oldItem._id)
+
+      expect(mockUpdate).toHaveBeenCalledTimes(2)
+      const updateQuery = mockUpdate.mock.calls[0][0].getUpdate()
+      expect(updateQuery.$set).toEqual(expectedQuery)
+      const updateQuery2 = mockUpdate.mock.calls[1][0].getUpdate()
+      expect(updateQuery2.$set).toEqual(expectedQuery)
+    })
   })
 })
 

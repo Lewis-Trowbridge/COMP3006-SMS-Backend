@@ -1,6 +1,7 @@
-import { Schema } from 'mongoose'
+import { Schema, Types } from 'mongoose'
 
 interface IShoppingListItem {
+  _id: Types.ObjectId
   text: string
   quantity: number
 }

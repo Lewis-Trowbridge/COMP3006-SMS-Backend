@@ -1,6 +1,7 @@
 import { HydratedDocument, Types } from 'mongoose'
 import { IShoppingList, ShoppingList } from '../../models/customer/ShoppingList'
 import { Api304Error, Api404Error } from '../../setup/exceptions'
+import { IShoppingListItem } from '../../models/customer/ShoppingListItem'
 
 export default class ShoppingListService {
   async new (): Promise<HydratedDocument<IShoppingList>> {
@@ -20,5 +21,23 @@ export default class ShoppingListService {
     list.editors.push(userId)
     list.updated = new Date()
     await list.save()
+  }
+
+  async resolveChanges (listId: string, changes: IShoppingListItem[]): Promise<HydratedDocument<IShoppingList> | null> {
+    const list = await ShoppingList.findById(listId)
+    if (list == null) {
+      return null
+    }
+    for (const change of changes) {
+      const item = list.items.find(item => item._id === change._id)
+      if (item === undefined) {
+        list.items.push(change)
+      } else {
+        item.text = change.text
+        item.quantity = change.quantity
+      }
+    }
+    await list.save()
+    return await ShoppingList.findById(listId)
   }
 }

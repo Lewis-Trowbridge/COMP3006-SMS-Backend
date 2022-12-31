@@ -3,11 +3,12 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import http from 'http'
 import SocketIO from 'socket.io'
-import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from './customer/socketEvents'
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from './setup/socketEvents'
 import { connect } from 'mongoose'
 import { URLS } from './constants'
 import itemRoutes from './setup/routes/itemRoutes'
 import shoppingListRoutes from './setup/routes/shoppingListRoutes'
+import { resolveChangesSetupSocket } from './controllers/ShoppingListController'
 
 const app: express.Express = express()
 app.use(cors({
@@ -19,8 +20,11 @@ app.use('/lists', shoppingListRoutes)
 
 const server: http.Server = http.createServer(app)
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const io = new SocketIO.Server<ServerToClientEvents, ClientToServerEvents, InterServerEvents>(server)
+const io = new SocketIO.Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(server)
+io.on('connection', socket => {
+  resolveChangesSetupSocket(socket)
+  socket.emit('acknowledge')
+})
 
 const connectionPromise = connect(URLS.MONGO)
 

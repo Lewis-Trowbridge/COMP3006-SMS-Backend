@@ -5,6 +5,7 @@ import ShoppingListService from '../ShoppingListService'
 import { mongoExcludeIdsToObjectOptions } from '../../../constants'
 import { Types } from 'mongoose'
 import { Api304Error, Api404Error } from '../../../setup/exceptions'
+import { IShoppingListItem } from '../../../models/customer/ShoppingListItem'
 // Mockingoose does not work with ES6 imports: https://stackoverflow.com/questions/70156753/typeerror-0-mockingoose-default-is-not-a-function-mockingooose
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose')
@@ -71,6 +72,109 @@ describe('ShoppingListService', () => {
       const service = new ShoppingListService()
       await expect(async () => await service.addEditor(ownerId, fakeList.id))
         .rejects.toThrow(new Api304Error('User already has permission to edit this list.'))
+    })
+  })
+  describe('resolveChanges', () => {
+    it('updates a single item', async () => {
+      const oldItem: IShoppingListItem = {
+        _id: new Types.ObjectId(),
+        quantity: 1,
+        text: 'oldText'
+      }
+      const fakeItem = await ShoppingList.create({
+        created: new Date(),
+        items: [oldItem],
+        ownerId: new Types.ObjectId().toString()
+      })
+      mockingoose(ShoppingList).toReturn(fakeItem, 'findOne')
+      const newChanges: IShoppingListItem = {
+        _id: oldItem._id,
+        quantity: 2,
+        text: 'newText'
+      }
+
+      const service = new ShoppingListService()
+      await service.resolveChanges(oldItem._id.toString(), [newChanges])
+
+      expect(fakeItem.items[0].toObject()).toEqual(newChanges)
+    })
+
+    it('updates multiple items', async () => {
+      const oldItem: IShoppingListItem = {
+        _id: new Types.ObjectId(),
+        quantity: 1,
+        text: 'oldText'
+      }
+      const oldItem2: IShoppingListItem = { ...oldItem, _id: new Types.ObjectId() }
+      const fakeItem = await ShoppingList.create({
+        created: new Date(),
+        items: [oldItem, oldItem2],
+        ownerId: new Types.ObjectId().toString()
+      })
+      mockingoose(ShoppingList).toReturn(fakeItem, 'findOne')
+      const newChanges: IShoppingListItem = {
+        _id: oldItem._id,
+        quantity: 2,
+        text: 'newText'
+      }
+      const newChanges2: IShoppingListItem = {
+        ...newChanges,
+        _id: oldItem2._id
+      }
+
+      const service = new ShoppingListService()
+      await service.resolveChanges(oldItem._id.toString(), [newChanges, newChanges2])
+
+      expect(fakeItem.items[0].toObject()).toEqual(newChanges)
+      expect(fakeItem.items[1].toObject()).toEqual(newChanges2)
+    })
+
+    it('adds new items', async () => {
+      const fakeItem = await ShoppingList.create({
+        created: new Date(),
+        ownerId: new Types.ObjectId().toString()
+      })
+      mockingoose(ShoppingList).toReturn(fakeItem, 'findOne')
+      const newChanges: IShoppingListItem = {
+        _id: new Types.ObjectId(),
+        quantity: 2,
+        text: 'newText'
+      }
+
+      const service = new ShoppingListService()
+      await service.resolveChanges(fakeItem._id.toString(), [newChanges])
+
+      expect(fakeItem.items[0].toObject()).toEqual(newChanges)
+    })
+
+    it('adds new items and updates existing items at the same time', async () => {
+      const oldItem: IShoppingListItem = {
+        _id: new Types.ObjectId(),
+        quantity: 1,
+        text: 'oldText'
+      }
+      const fakeItem = await ShoppingList.create({
+        created: new Date(),
+        items: [oldItem],
+        ownerId: new Types.ObjectId().toString()
+      })
+      mockingoose(ShoppingList).toReturn(fakeItem, 'findOne')
+      const existingChanges: IShoppingListItem = {
+        _id: oldItem._id,
+        quantity: 2,
+        text: 'newText'
+      }
+      const newChanges: IShoppingListItem = {
+        _id: new Types.ObjectId(),
+        quantity: 2,
+        text: 'newText'
+      }
+
+      const service = new ShoppingListService()
+      await service.resolveChanges(fakeItem._id.toString(), [newChanges, existingChanges])
+
+      expect(fakeItem.items[0].toObject()).toEqual(existingChanges)
+      expect(fakeItem.items[1].toObject()).toEqual(newChanges)
     })
   })
 })

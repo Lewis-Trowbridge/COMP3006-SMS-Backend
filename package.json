@@ -36,6 +36,7 @@
     "jest-mock-extended": "^3.0.1",
     "mockingoose": "^2.16.2",
     "mongo-unit": "^3.2.0",
+    "socket.io-mock-ts": "^1.0.2",
     "supertest": "^6.3.2",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",

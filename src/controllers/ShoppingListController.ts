@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import ShoppingListService from '../services/customer/ShoppingListService'
 import { mongoExcludeIdsToObjectOptions } from '../constants'
+import { Socket } from 'socket.io'
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from '../setup/socketEvents'
 
 const service = new ShoppingListService()
 
@@ -18,7 +20,20 @@ const addEditorPatch = async (req: Request, res: Response): Promise<void> => {
   res.status(204).send()
 }
 
+const resolveChangesSetupSocket = (socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents>): void => {
+  socket.on('joinListRoom', async (listId) => {
+    await socket.join(listId)
+    socket.emit('acknowledge')
+  })
+  socket.on('resolveChanges', async (listId, changes) => {
+    const updatedList = await service.resolveChanges(listId, changes)
+    socket.to(listId).emit('distributeCanonical', updatedList?.items ?? [])
+    socket.emit('acknowledge')
+  })
+}
+
 export {
   addEditorPatch,
-  newPost
+  newPost,
+  resolveChangesSetupSocket
 }

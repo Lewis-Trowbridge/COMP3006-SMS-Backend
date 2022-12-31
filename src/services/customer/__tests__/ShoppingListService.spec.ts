@@ -1,6 +1,6 @@
 // Mockingoose does not work with ES6 imports: https://stackoverflow.com/questions/70156753/typeerror-0-mockingoose-default-is-not-a-function-mockingooose
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import { ShoppingList } from '../../../models/customer/ShoppingList'
+import { IShoppingList, ShoppingList } from '../../../models/customer/ShoppingList'
 import ShoppingListService from '../ShoppingListService'
 import { mongoExcludeIdsToObjectOptions } from '../../../constants'
 import { Types } from 'mongoose'
@@ -32,6 +32,30 @@ describe('ShoppingListService', () => {
       const actual = await service.new()
       expect(actual.toObject(mongoExcludeIdsToObjectOptions))
         .toEqual(expected.toObject(mongoExcludeIdsToObjectOptions))
+    })
+  })
+
+  describe('listAll', () => {
+    it('returns all lists belonging to the user', async () => {
+      const testUserId = 'user'
+      const expected = await ShoppingList.create({
+        created: currentTime,
+        ownerId: testUserId
+      })
+      mockingoose(ShoppingList).toReturn([expected], 'find')
+      const service = new ShoppingListService()
+      const actual = await service.listAll()
+      expect(actual.length).toBe(1)
+      expect(actual[0].toObject())
+        .toEqual(expected.toObject())
+    })
+
+    it('returns an empty list when no lists belong to the user', async () => {
+      // const testUserId = 'user'
+      mockingoose(ShoppingList).toReturn([], 'find')
+      const service = new ShoppingListService()
+      const actual = await service.listAll()
+      expect(actual.length).toBe(0)
     })
   })
 

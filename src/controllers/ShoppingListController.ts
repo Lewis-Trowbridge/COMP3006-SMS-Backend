@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import ShoppingListService from '../services/customer/ShoppingListService'
-import { mongoExcludeIdsToObjectOptions } from '../constants'
+import { mongoExcludeIdsToObjectOptions, mongoExcludeVersionToObjectOptions } from '../constants'
 import { Socket } from 'socket.io'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from '../setup/socketEvents'
 
@@ -9,6 +9,11 @@ const service = new ShoppingListService()
 const newPost = async (req: Request, res: Response): Promise<void> => {
   const result = await service.new()
   res.status(201).json(result.toObject(mongoExcludeIdsToObjectOptions))
+}
+
+const listAllGet = async (req: Request, res: Response): Promise<void> => {
+  const results = await service.listAll()
+  res.status(200).json(results.map(result => result.toObject(mongoExcludeVersionToObjectOptions)))
 }
 
 const addEditorPatch = async (req: Request, res: Response): Promise<void> => {
@@ -34,6 +39,7 @@ const resolveChangesSetupSocket = (socket: Socket<ClientToServerEvents, ServerTo
 
 export {
   addEditorPatch,
+  listAllGet,
   newPost,
   resolveChangesSetupSocket
 }

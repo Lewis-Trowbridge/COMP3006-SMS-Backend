@@ -38,7 +38,7 @@ describe('ShoppingListController', () => {
   })
 
   describe('listAllGet', () => {
-    it('calls shopping list service\'s "new" method', async () => {
+    it('calls shopping list service\'s "listAll" method', async () => {
       const expectedResponse = mock<HydratedDocument<IShoppingList>>()
       expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockShoppingListService.prototype?.listAll.mockResolvedValue([expectedResponse])
@@ -48,7 +48,7 @@ describe('ShoppingListController', () => {
       expect(mockShoppingListService.prototype?.listAll).toHaveBeenCalledTimes(1)
     })
 
-    it('returns response from ShoppingListService new', async () => {
+    it('returns response from ShoppingListService listAll', async () => {
       const expectedResponse = mock<HydratedDocument<IShoppingList>>()
       expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockShoppingListService.prototype?.listAll.mockResolvedValue([expectedResponse])

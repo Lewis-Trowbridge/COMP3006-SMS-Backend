@@ -95,9 +95,8 @@ describe('ShoppingListService', () => {
 
       const service = new ShoppingListService()
       await service.resolveChanges(oldItem._id.toString(), [newChanges])
-      
-      expect(fakeItem.items[0].toObject()).toEqual(newChanges)
 
+      expect(fakeItem.items[0].toObject()).toEqual(newChanges)
     })
 
     it('updates multiple items', async () => {
@@ -141,7 +140,7 @@ describe('ShoppingListService', () => {
         quantity: 2,
         text: 'newText'
       }
-      
+
       const service = new ShoppingListService()
       await service.resolveChanges(fakeItem._id.toString(), [newChanges])
 
@@ -170,7 +169,7 @@ describe('ShoppingListService', () => {
         quantity: 2,
         text: 'newText'
       }
-      
+
       const service = new ShoppingListService()
       await service.resolveChanges(fakeItem._id.toString(), [newChanges, existingChanges])
 

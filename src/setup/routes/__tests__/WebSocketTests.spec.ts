@@ -60,7 +60,6 @@ describe('SOCKET resolve changes', () => {
     mockServerSocket.clientMock.emit('resolveChanges', listId, [newChanges])
     await acknowledge
     const updatedList = await ShoppingList.findById(listId)
-    console.log(updatedList, newChanges)
     expect(updatedList?.items.length).toBe(1)
     expect(updatedList?.items[0].toObject()).toEqual(newChanges)
   }, 10000)

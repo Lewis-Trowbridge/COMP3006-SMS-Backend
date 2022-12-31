@@ -10,7 +10,7 @@ const currentTime = new Date(2022, 1, 1)
 
 beforeAll(async () => {
   // Breaks jest function timeouts if nextTick is mocked
-  jest.useFakeTimers({ doNotFake: ['nextTick', 'setTimeout'] })
+  jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] })
     .setSystemTime(currentTime)
   await mongoUnit.start()
   await connect(mongoUnit.getUrl())
@@ -39,7 +39,7 @@ describe('Shopping list routes (integration tests)', () => {
     }, 10000)
   })
 
-  describe('POST /add-editor', () => {
+  describe('PATCH /add-editor', () => {
     it('Returns HTTP 204 and adds a given user to a given list', async () => {
       const request = supertest(testApp)
       const mockOwnerId = 'owner'
@@ -50,15 +50,14 @@ describe('Shopping list routes (integration tests)', () => {
         userId: mockEditorId
       }
 
-      const response = await request.post('/lists/add-editor')
+      const response = await request.patch('/lists/add-editor')
         .type('form')
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .send(expectedObject)
 
-      const updatedList = await ShoppingList.findById(expectedObject.listId)
       expect(response.status).toBe(204)
-      expect(updatedList?.editors).toContain(mockEditorId)
+      expect(testList.editors).toContain(mockEditorId)
     }, 10000)
 
     it('returns HTTP 400 and error when given missing ids', async () => {
@@ -78,7 +77,7 @@ describe('Shopping list routes (integration tests)', () => {
         ]
       }
 
-      const response = await request.post('/lists/add-editor')
+      const response = await request.patch('/lists/add-editor')
         .send()
 
       expect(response.status).toBe(400)

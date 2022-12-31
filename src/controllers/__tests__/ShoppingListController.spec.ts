@@ -46,7 +46,7 @@ describe('ShoppingListController', () => {
       const mockRequest = mock<Request>({
         body: expectedBody
       })
-      const mockResponse = mock<Response>({ status: jest.fn() })
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ send: jest.fn() }) })
       await addEditorPatch(mockRequest, mockResponse)
       expect(mockShoppingListService.prototype?.addEditor).toHaveBeenCalledTimes(1)
       expect(mockShoppingListService.prototype?.addEditor).toHaveBeenNthCalledWith(1, expectedBody.userId, expectedBody.listId)

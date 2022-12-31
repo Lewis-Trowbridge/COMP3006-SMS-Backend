@@ -1,6 +1,7 @@
 import { HydratedDocument, Types } from 'mongoose'
 import { IShoppingList, ShoppingList } from '../../models/customer/ShoppingList'
 import { Api304Error, Api404Error } from '../../setup/exceptions'
+import { IShoppingListItem } from '../../models/customer/ShoppingListItem'
 
 export default class ShoppingListService {
   async new (): Promise<HydratedDocument<IShoppingList>> {
@@ -20,5 +21,25 @@ export default class ShoppingListService {
     list.editors.push(userId)
     list.updated = new Date()
     await list.save()
+  }
+
+  async resolveChanges (listId: string, changes: IShoppingListItem[]): Promise<HydratedDocument<IShoppingList>> {
+    for (const change of changes) {
+      // Use text fields where JS/TS cannot detect format
+      await ShoppingList.updateOne({ _id: listId, 'items._id': change._id },
+        {
+          $set: {
+            'items.$.quantity': change.quantity,
+            'items.$.text': change.text
+          }
+        },
+        { upsert: true }
+      )
+    }
+    const updatedList = await ShoppingList.findById(listId)
+    if (updatedList == null) {
+      throw new Api404Error()
+    }
+    return updatedList
   }
 }

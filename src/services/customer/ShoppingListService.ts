@@ -10,6 +10,12 @@ export default class ShoppingListService {
     return await ShoppingList.create({ created: new Date(), ownerId: userId })
   }
 
+  async listAll (): Promise<Array<HydratedDocument<IShoppingList>>> {
+    // TODO: Replace with session value when implemented
+    const userId = 'user'
+    return await ShoppingList.find({ ownerId: userId })
+  }
+
   async addEditor (userId: string, listId: Types.ObjectId): Promise<void> {
     const list = await ShoppingList.findById(listId)
     if (list == null) {

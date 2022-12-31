@@ -39,6 +39,29 @@ describe('Shopping list routes (integration tests)', () => {
     }, 10000)
   })
 
+  describe('GET /list-all', () => {
+    it('returns HTTP 200 and a shopping lists owned by the current user', async () => {
+      const mockUserId = 'user'
+      const request = supertest(testApp)
+      const item = await ShoppingList.create({
+        created: currentTime,
+        ownerId: mockUserId
+      })
+      const expectedObject = {
+        _id: item._id.toString(),
+        created: currentTime.toISOString(),
+        editors: [],
+        items: [],
+        ownerId: mockUserId
+      }
+      const response = await request.get('/lists/list-all')
+        .send()
+
+      expect(response.status).toBe(200)
+      expect(response.body).toContainEqual(expectedObject)
+    }, 10000)
+  })
+
   describe('PATCH /add-editor', () => {
     it('Returns HTTP 204 and adds a given user to a given list', async () => {
       const request = supertest(testApp)

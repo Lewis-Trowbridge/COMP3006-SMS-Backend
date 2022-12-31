@@ -2,7 +2,7 @@ import mocked = jest.mocked
 import ShoppingListService from '../../services/customer/ShoppingListService'
 import { mock } from 'jest-mock-extended'
 import { Request, Response } from 'express'
-import { addEditorPatch, newPost } from '../ShoppingListController'
+import { addEditorPatch, listAllGet, newPost } from '../ShoppingListController'
 import { HydratedDocument, Types } from 'mongoose'
 import { IShoppingList } from '../../models/customer/ShoppingList'
 
@@ -34,6 +34,32 @@ describe('ShoppingListController', () => {
 
       expect(mockJsonFunc).toHaveBeenCalledTimes(1)
       expect(mockJsonFunc).toHaveBeenNthCalledWith(1, expectedResponse)
+    })
+  })
+
+  describe('listAllGet', () => {
+    it('calls shopping list service\'s "listAll" method', async () => {
+      const expectedResponse = mock<HydratedDocument<IShoppingList>>()
+      expectedResponse.toObject.mockReturnValue(expectedResponse)
+      mockShoppingListService.prototype?.listAll.mockResolvedValue([expectedResponse])
+      const mockRequest = mock<Request>()
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: jest.fn() }) })
+      await listAllGet(mockRequest, mockResponse)
+      expect(mockShoppingListService.prototype?.listAll).toHaveBeenCalledTimes(1)
+    })
+
+    it('returns response from ShoppingListService listAll', async () => {
+      const expectedResponse = mock<HydratedDocument<IShoppingList>>()
+      expectedResponse.toObject.mockReturnValue(expectedResponse)
+      mockShoppingListService.prototype?.listAll.mockResolvedValue([expectedResponse])
+      const mockRequest = mock<Request>()
+      const mockJsonFunc = jest.fn()
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
+
+      await listAllGet(mockRequest, mockResponse)
+
+      expect(mockJsonFunc).toHaveBeenCalledTimes(1)
+      expect(mockJsonFunc).toHaveBeenNthCalledWith(1, [expectedResponse])
     })
   })
 

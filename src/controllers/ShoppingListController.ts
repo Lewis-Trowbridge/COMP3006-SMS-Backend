@@ -26,10 +26,9 @@ const resolveChangesSetupSocket = (socket: Socket<ClientToServerEvents, ServerTo
     socket.emit('acknowledge')
   })
   socket.on('resolveChanges', async (listId, changes) => {
-    if (socket.rooms.has(listId)) {
-      const updatedList = await service.resolveChanges(listId, changes)
-      socket.to(listId).emit('distributeCanonical', updatedList.items)
-    }
+    const updatedList = await service.resolveChanges(listId, changes)
+    socket.to(listId).emit('distributeCanonical', updatedList?.items ?? [])
+    socket.emit('acknowledge')
   })
 }
 

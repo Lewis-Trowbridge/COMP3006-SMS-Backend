@@ -23,23 +23,22 @@ export default class ShoppingListService {
     await list.save()
   }
 
-  async resolveChanges (listId: string, changes: IShoppingListItem[]): Promise<HydratedDocument<IShoppingList>> {
+  async resolveChanges (listId: string, changes: IShoppingListItem[]): Promise<HydratedDocument<IShoppingList> | null> {
+    const list = await ShoppingList.findById(listId)
+    if (list == null) {
+      return null
+    }
     for (const change of changes) {
-      // Use text fields where JS/TS cannot detect format
-      await ShoppingList.updateOne({ _id: listId, 'items._id': change._id },
-        {
-          $set: {
-            'items.$.quantity': change.quantity,
-            'items.$.text': change.text
-          }
-        },
-        { upsert: true }
-      )
+      const item = list.items.find(item => item._id === change._id)
+      if (item === undefined) {
+        list.items.push(change)
+      } else {
+        item.text = change.text
+        item.quantity = change.quantity
+      }
     }
-    const updatedList = await ShoppingList.findById(listId)
-    if (updatedList == null) {
-      throw new Api404Error()
-    }
-    return updatedList
+    await list.save()
+    console.log(list)
+    return await ShoppingList.findById(listId)
   }
 }

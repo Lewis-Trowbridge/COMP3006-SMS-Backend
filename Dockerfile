@@ -11,6 +11,6 @@ from node:16
 COPY --from=build package.json .
 COPY --from=build dist/ .
 
-RUN [ "yarn" "install", "--production=true", "--frozen-lockfile" ]
+RUN [ "yarn", "install", "--production=true" ]
 
 ENTRYPOINT [ "yarn", "serve" ]

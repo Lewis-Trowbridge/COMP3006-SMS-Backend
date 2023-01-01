@@ -9,6 +9,7 @@ RUN [ "yarn", "build" ]
 from node:16
 
 COPY --from=build package.json .
+COPY --from=build yarn.lock .
 COPY --from=build dist/ .
 
 RUN [ "yarn", "install", "--production=true" ]

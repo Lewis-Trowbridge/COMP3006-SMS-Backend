@@ -3,7 +3,7 @@ name: Push and deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "docker-reduce-image-size" ]
 
 jobs:
   build:

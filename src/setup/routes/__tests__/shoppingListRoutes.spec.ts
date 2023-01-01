@@ -26,6 +26,7 @@ describe('Shopping list routes (integration tests)', () => {
       const mockUserId = 'user'
       const request = supertest(testApp)
       const expectedObject = {
+        _id: expect.any(String),
         created: currentTime.toISOString(),
         editors: [],
         items: [],

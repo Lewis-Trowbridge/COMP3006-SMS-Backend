@@ -11,6 +11,16 @@ const newPost = async (req: Request, res: Response): Promise<void> => {
   res.status(201).json(result.toObject(mongoExcludeVersionToObjectOptions))
 }
 
+const getListGet = async (req: Request<{}, {}, {}, { listId: string }>, res: Response): Promise<void> => {
+  const { listId } = req.query
+  const result = await service.get(listId)
+  if (result == null) {
+    res.sendStatus(404)
+  } else {
+    res.status(200).json(result.toObject(mongoExcludeVersionToObjectOptions))
+  }
+}
+
 const listAllGet = async (req: Request, res: Response): Promise<void> => {
   const results = await service.listAll()
   res.status(200).json(results.map(result => result.toObject(mongoExcludeVersionToObjectOptions)))
@@ -38,6 +48,7 @@ const resolveChangesSetupSocket = (socket: Socket<ClientToServerEvents, ServerTo
 }
 
 export {
+  getListGet,
   addEditorPatch,
   listAllGet,
   newPost,

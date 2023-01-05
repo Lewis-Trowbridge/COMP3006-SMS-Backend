@@ -40,6 +40,30 @@ describe('Shopping list routes (integration tests)', () => {
     }, 10000)
   })
 
+  describe('GET /get', () => {
+    it('returns HTTP 200 and a given shopping list', async () => {
+      const mockUserId = 'user'
+      const request = supertest(testApp)
+      const item = await ShoppingList.create({
+        created: currentTime,
+        ownerId: mockUserId
+      })
+      const expectedObject = {
+        _id: item._id.toString(),
+        created: currentTime.toISOString(),
+        editors: [],
+        items: [],
+        ownerId: mockUserId
+      }
+      const response = await request.get('/lists/get')
+        .query({ listId: item.id })
+        .send()
+
+      expect(response.status).toBe(200)
+      expect(response.body).toEqual(expectedObject)
+    }, 10000)
+  })
+
   describe('GET /list-all', () => {
     it('returns HTTP 200 and a shopping lists owned by the current user', async () => {
       const mockUserId = 'user'

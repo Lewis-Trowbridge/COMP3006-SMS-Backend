@@ -58,6 +58,31 @@ describe('ShoppingListService', () => {
     })
   })
 
+  describe('get', () => {
+    it('returns a found list', async () => {
+      const testUserId = 'user'
+      const expected = await ShoppingList.create({
+        created: currentTime,
+        ownerId: testUserId
+      })
+      mockingoose(ShoppingList).toReturn(expected, 'findOne')
+      const service = new ShoppingListService()
+
+      const actual = await service.get(expected.id)
+
+      expect(actual).toBe(expected)
+    })
+
+    it('returns null when no list is found', async () => {
+      mockingoose(ShoppingList).toReturn(null, 'findOne')
+      const service = new ShoppingListService()
+
+      const actual = await service.get('')
+
+      expect(actual).toBeNull()
+    })
+  })
+
   describe('addEditor', () => {
     it('adds a new user to a given list', async () => {
       const ownerId = 'user'

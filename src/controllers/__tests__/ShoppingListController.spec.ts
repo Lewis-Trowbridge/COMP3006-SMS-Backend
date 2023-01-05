@@ -2,7 +2,7 @@ import mocked = jest.mocked
 import ShoppingListService from '../../services/customer/ShoppingListService'
 import { mock } from 'jest-mock-extended'
 import { Request, Response } from 'express'
-import { addEditorPatch, listAllGet, newPost } from '../ShoppingListController'
+import { addEditorPatch, getListGet, listAllGet, newPost } from '../ShoppingListController'
 import { HydratedDocument, Types } from 'mongoose'
 import { IShoppingList } from '../../models/customer/ShoppingList'
 
@@ -34,6 +34,49 @@ describe('ShoppingListController', () => {
 
       expect(mockJsonFunc).toHaveBeenCalledTimes(1)
       expect(mockJsonFunc).toHaveBeenNthCalledWith(1, expectedResponse)
+    })
+  })
+
+  describe('getListGet', () => {
+    it('calls shopping list service\'s "get" method', async () => {
+      const expectedResponse = mock<HydratedDocument<IShoppingList>>()
+      expectedResponse.toObject.mockReturnValue(expectedResponse)
+      mockShoppingListService.prototype?.get.mockResolvedValue(expectedResponse)
+      const mockListId = 'list'
+      const mockRequest = mock<Request<{}, {}, {}, { listId: string }>>({ query: { listId: mockListId } })
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: jest.fn() }) })
+      await getListGet(mockRequest, mockResponse)
+      expect(mockShoppingListService.prototype?.get).toHaveBeenCalledTimes(1)
+      expect(mockShoppingListService.prototype.get).toHaveBeenNthCalledWith(1, mockListId)
+    })
+
+    it('returns response from ShoppingListService get', async () => {
+      const expectedResponse = mock<HydratedDocument<IShoppingList>>()
+      expectedResponse.toObject.mockReturnValue(expectedResponse)
+      mockShoppingListService.prototype?.get.mockResolvedValue(expectedResponse)
+      const mockListId = 'list'
+      const mockRequest = mock<Request<{}, {}, {}, { listId: string }>>({ query: { listId: mockListId } })
+      const mockJsonFunc = jest.fn().mockReturnValue({ send: jest.fn() })
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
+
+      await getListGet(mockRequest, mockResponse)
+
+      expect(mockJsonFunc).toHaveBeenCalledTimes(1)
+      expect(mockJsonFunc).toHaveBeenNthCalledWith(1, expectedResponse)
+    })
+
+    it('returns null from ShoppingListService get', async () => {
+      const expectedResponse = null
+      mockShoppingListService.prototype?.get.mockResolvedValue(expectedResponse)
+      const mockListId = 'list'
+      const mockRequest = mock<Request<{}, {}, {}, { listId: string }>>({ query: { listId: mockListId } })
+      const mockSendStatus = jest.fn().mockReturnValue({ send: jest.fn() })
+      const mockResponse = mock<Response>({ sendStatus: mockSendStatus })
+
+      await getListGet(mockRequest, mockResponse)
+
+      expect(mockSendStatus).toHaveBeenCalledTimes(1)
+      expect(mockSendStatus).toHaveBeenNthCalledWith(1, 404)
     })
   })
 

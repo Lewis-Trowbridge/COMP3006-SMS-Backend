@@ -35,6 +35,9 @@ export default class ShoppingListService {
       return null
     }
     for (const change of changes) {
+      if (change._id.toString() === '') {
+        change._id = new Types.ObjectId()
+      }
       const item = list.items.find(item => item._id === change._id)
       if (item === undefined) {
         list.items.push(change)

@@ -10,6 +10,10 @@ export default class ShoppingListService {
     return await ShoppingList.create({ created: new Date(), ownerId: userId })
   }
 
+  async get (listId: string): Promise<HydratedDocument<IShoppingList> | null> {
+    return await ShoppingList.findById(listId)
+  }
+
   async listAll (): Promise<Array<HydratedDocument<IShoppingList>>> {
     // TODO: Replace with session value when implemented
     const userId = 'user'

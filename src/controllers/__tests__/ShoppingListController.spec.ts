@@ -43,7 +43,7 @@ describe('ShoppingListController', () => {
       expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockShoppingListService.prototype?.get.mockResolvedValue(expectedResponse)
       const mockListId = 'list'
-      const mockRequest = mock<Request>({ body: { listId: mockListId } })
+      const mockRequest = mock<Request<{}, {}, {}, { listId: string }>>({ query: { listId: mockListId } })
       const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: jest.fn() }) })
       await getListGet(mockRequest, mockResponse)
       expect(mockShoppingListService.prototype?.get).toHaveBeenCalledTimes(1)
@@ -55,7 +55,7 @@ describe('ShoppingListController', () => {
       expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockShoppingListService.prototype?.get.mockResolvedValue(expectedResponse)
       const mockListId = 'list'
-      const mockRequest = mock<Request>({ body: { listId: mockListId } })
+      const mockRequest = mock<Request<{}, {}, {}, { listId: string }>>({ query: { listId: mockListId } })
       const mockJsonFunc = jest.fn().mockReturnValue({ send: jest.fn() })
       const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
 
@@ -69,7 +69,7 @@ describe('ShoppingListController', () => {
       const expectedResponse = null
       mockShoppingListService.prototype?.get.mockResolvedValue(expectedResponse)
       const mockListId = 'list'
-      const mockRequest = mock<Request>({ body: { listId: mockListId } })
+      const mockRequest = mock<Request<{}, {}, {}, { listId: string }>>({ query: { listId: mockListId } })
       const mockSendStatus = jest.fn().mockReturnValue({ send: jest.fn() })
       const mockResponse = mock<Response>({ sendStatus: mockSendStatus })
 

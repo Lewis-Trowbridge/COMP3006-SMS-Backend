@@ -11,8 +11,8 @@ const newPost = async (req: Request, res: Response): Promise<void> => {
   res.status(201).json(result.toObject(mongoExcludeVersionToObjectOptions))
 }
 
-const getListGet = async (req: Request, res: Response): Promise<void> => {
-  const { listId } = req.body
+const getListGet = async (req: Request<{}, {}, {}, { listId: string }>, res: Response): Promise<void> => {
+  const { listId } = req.query
   const result = await service.get(listId)
   if (result == null) {
     res.sendStatus(404)

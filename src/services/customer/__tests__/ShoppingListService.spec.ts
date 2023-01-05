@@ -4,6 +4,7 @@ import { mongoExcludeIdsToObjectOptions } from '../../../constants'
 import { Types } from 'mongoose'
 import { Api304Error, Api404Error } from '../../../setup/exceptions'
 import { IShoppingListItem } from '../../../models/customer/ShoppingListItem'
+import { mock } from 'jest-mock-extended'
 // Mockingoose does not work with ES6 imports: https://stackoverflow.com/questions/70156753/typeerror-0-mockingoose-default-is-not-a-function-mockingooose
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose')
@@ -206,7 +207,7 @@ describe('ShoppingListService', () => {
       })
       mockingoose(ShoppingList).toReturn(fakeItem, 'findOne')
       const newChanges: IShoppingListItem = {
-        _id: new Types.ObjectId(''),
+        _id: mock<Types.ObjectId>({ toString: () => { return '' } }),
         quantity: 2,
         text: 'newText'
       }

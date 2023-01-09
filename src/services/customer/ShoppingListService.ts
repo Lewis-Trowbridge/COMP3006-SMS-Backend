@@ -41,7 +41,7 @@ export default class ShoppingListService {
       if (change._id.toString() === '') {
         change._id = new Types.ObjectId()
       }
-      const item = list.items.find(item => item._id === change._id)
+      const item = list.items.find(item => item._id.toString() === change._id.toString())
       if (item === undefined) {
         list.items.push(change)
       } else {

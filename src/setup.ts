@@ -10,11 +10,9 @@ import itemRoutes from './setup/routes/itemRoutes'
 import shoppingListRoutes from './setup/routes/shoppingListRoutes'
 import { resolveChangesSetupSocket } from './controllers/ShoppingListController'
 
-const allowedOrigins = ['http://localhost', 'https://storage.googleapis.com']
-
 const app: express.Express = express()
 app.use(cors({
-  origin: allowedOrigins
+  origin: URLS.ALLOWED_ORIGIN
 }))
 app.use(bodyParser.json({}))
 app.use('/items', itemRoutes)
@@ -25,7 +23,7 @@ const server: http.Server = http.createServer(app)
 const io = new SocketIO.Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(server, {
   cors: {
     // Despite information online, Socket.io CORS does not appear to work with multiple origins
-    origin: URLS.SOCKET_ORIGIN
+    origin: URLS.ALLOWED_ORIGIN
   }
 })
 io.on('connection', socket => {

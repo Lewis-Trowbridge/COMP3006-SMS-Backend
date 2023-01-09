@@ -6,9 +6,13 @@ interface IShoppingListItem {
   quantity: number
 }
 
+
+const EmptyAllowedString = Schema.Types.String
+EmptyAllowedString.checkRequired(v => typeof v === 'string');
+
 const ShoppingListItemSchema = new Schema<IShoppingListItem>({
   quantity: { default: 0, required: true, type: Number },
-  text: { default: '', required: true, type: String }
+  text: { default: '', required: true, type: EmptyAllowedString }
 })
 
 export {

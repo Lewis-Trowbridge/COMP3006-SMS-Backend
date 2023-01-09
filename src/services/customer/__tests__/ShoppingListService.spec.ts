@@ -21,7 +21,6 @@ describe('ShoppingListService', () => {
     it('returns a new shopping list belonging to the currently logged in user', async () => {
       const testUserId = 'user'
       const expected = new ShoppingList({
-        created: currentTime,
         editors: [],
         items: [],
         ownerId: testUserId
@@ -38,7 +37,6 @@ describe('ShoppingListService', () => {
     it('returns all lists belonging to the user', async () => {
       const testUserId = 'user'
       const expected = await ShoppingList.create({
-        created: currentTime,
         ownerId: testUserId
       })
       mockingoose(ShoppingList).toReturn([expected], 'find')
@@ -62,7 +60,6 @@ describe('ShoppingListService', () => {
     it('returns a found list', async () => {
       const testUserId = 'user'
       const expected = await ShoppingList.create({
-        created: currentTime,
         ownerId: testUserId
       })
       mockingoose(ShoppingList).toReturn(expected, 'findOne')

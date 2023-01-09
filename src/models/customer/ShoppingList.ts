@@ -5,17 +5,15 @@ interface IShoppingList {
   ownerId: string
   editors: string[]
   created: Date
-  updated: Date | null
+  updated: Date
   items: IShoppingListItem[]
 }
 
 const ShoppingListSchema = new Schema<IShoppingList>({
-  created: { required: true, type: Date },
   editors: { default: [], required: true, type: [String] },
   items: { default: [], required: true, type: [ShoppingListItemSchema] },
-  ownerId: { required: true, type: String },
-  updated: { required: false, type: Date }
-})
+  ownerId: { required: true, type: String }
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 // Workaround for Mongoose in Typescript: https://mongoosejs.com/docs/typescript/subdocuments.html
 interface ShoppingListSubdocumentOverride {

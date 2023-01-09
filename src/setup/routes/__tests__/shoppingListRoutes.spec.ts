@@ -30,7 +30,8 @@ describe('Shopping list routes (integration tests)', () => {
         created: currentTime.toISOString(),
         editors: [],
         items: [],
-        ownerId: mockUserId
+        ownerId: mockUserId,
+        updated: currentTime.toISOString()
       }
       const response = await request.post('/lists/create')
         .send()
@@ -53,7 +54,8 @@ describe('Shopping list routes (integration tests)', () => {
         created: currentTime.toISOString(),
         editors: [],
         items: [],
-        ownerId: mockUserId
+        ownerId: mockUserId,
+        updated: currentTime.toISOString()
       }
       const response = await request.get('/lists/get')
         .query({ listId: item.id })
@@ -77,7 +79,8 @@ describe('Shopping list routes (integration tests)', () => {
         created: currentTime.toISOString(),
         editors: [],
         items: [],
-        ownerId: mockUserId
+        ownerId: mockUserId,
+        updated: currentTime.toISOString()
       }
       const response = await request.get('/lists/list-all')
         .send()

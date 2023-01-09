@@ -7,7 +7,7 @@ export default class ShoppingListService {
   async new (): Promise<HydratedDocument<IShoppingList>> {
     // TODO: Replace with session value when implemented
     const userId = 'user'
-    return await ShoppingList.create({ created: new Date(), ownerId: userId })
+    return await ShoppingList.create({ ownerId: userId })
   }
 
   async get (listId: string): Promise<HydratedDocument<IShoppingList> | null> {
@@ -29,7 +29,6 @@ export default class ShoppingListService {
       throw new Api304Error('User already has permission to edit this list.')
     }
     list.editors.push(userId)
-    list.updated = new Date()
     await list.save()
   }
 

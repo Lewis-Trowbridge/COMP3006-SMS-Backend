@@ -1,3 +1,4 @@
+import mocked = jest.mocked
 import { hash } from 'argon2'
 import { mongoExcludeIdsToObjectOptions } from '../../constants'
 import { User, UserType } from '../../models/User'
@@ -8,7 +9,7 @@ const mockingoose = require('mockingoose')
 
 jest.mock('argon2')
 
-const mockedHash = jest.mocked(hash)
+const mockedHash = mocked(hash)
 
 describe('UserService', () => {
   describe('create', () => {

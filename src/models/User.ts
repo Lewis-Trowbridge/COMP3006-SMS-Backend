@@ -15,7 +15,7 @@ interface IUser {
 const UserSchema = new Schema<IUser>({
   password: { required: true, type: String },
   type: { enum: UserType, required: true, type: Number },
-  username: { required: true, type: String }
+  username: { required: true, type: String, unique: true }
 })
 
 const User = model<IUser>('users', UserSchema)

@@ -9,8 +9,12 @@ const createPost = async (req: Request, res: Response): Promise<void> => {
     username,
     password
   } = req.body
-  await service.create(username, password, UserType.Customer)
-  res.sendStatus(201)
+  try {
+    await service.create(username, password, UserType.Customer)
+    res.sendStatus(201)
+  } catch {
+    res.sendStatus(304)
+  }
 }
 
 export {

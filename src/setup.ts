@@ -10,6 +10,7 @@ import itemRoutes from './setup/routes/itemRoutes'
 import shoppingListRoutes from './setup/routes/shoppingListRoutes'
 import userRoutes from './setup/routes/userRoutes'
 import { resolveChangesSetupSocket } from './controllers/ShoppingListController'
+import { IUser } from './models/User'
 
 const app: express.Express = express()
 app.use(cors({
@@ -19,6 +20,12 @@ app.use(bodyParser.json({}))
 app.use('/items', itemRoutes)
 app.use('/lists', shoppingListRoutes)
 app.use('/users', userRoutes)
+
+declare module 'express-session' {
+  interface SessionData {
+    user: IUser
+  }
+}
 
 const server: http.Server = http.createServer(app)
 

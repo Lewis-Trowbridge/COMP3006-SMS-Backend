@@ -8,12 +8,14 @@ export default class UserService {
     return await User.create({ password: hashedPassword, type, username })
   }
 
-  async verify (username: string, password: string): Promise<boolean> {
-    const hash = (await User.findOne({ username }))?.password
-    if (hash != null) {
-      return await verify(hash, password)
+  async verify (username: string, password: string): Promise<HydratedDocument<IUser> | null> {
+    const user = await User.findOne({ username })
+    if (user != null) {
+      if (await verify(user.password, password)) {
+        return user
+      }
     }
-    return false
+    return null
   }
 
   private async hashPassword (password: string): Promise<string> {

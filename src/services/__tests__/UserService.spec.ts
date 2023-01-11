@@ -32,7 +32,7 @@ describe('UserService', () => {
   })
 
   describe('verify', () => {
-    it('returns true when argon verify returns true', async () => {
+    it('returns user when argon verify returns true', async () => {
       const expectedHashedPassword = 'hashed'
       const expectedUser = new User({
         password: expectedHashedPassword,
@@ -44,10 +44,10 @@ describe('UserService', () => {
       const service = new UserService()
 
       const result = await service.verify(expectedUser.username, 'unhashed')
-      expect(result).toBe(true)
+      expect(result).toBe(expectedUser)
     })
 
-    it('returns false when argon verify returns false', async () => {
+    it('returns null when argon verify returns false', async () => {
       const expectedHashedPassword = 'hashed'
       const expectedUser = new User({
         password: expectedHashedPassword,
@@ -59,21 +59,15 @@ describe('UserService', () => {
       const service = new UserService()
 
       const result = await service.verify(expectedUser.username, 'unhashed')
-      expect(result).toBe(false)
+      expect(result).toBeNull()
     })
 
     it('returns false when no user is found', async () => {
-      const expectedHashedPassword = 'hashed'
-      const expectedUser = new User({
-        password: expectedHashedPassword,
-        type: UserType.Customer,
-        username: 'user'
-      })
       mockingoose(User).toReturn(undefined, 'findOne')
       const service = new UserService()
 
-      const result = await service.verify(expectedUser.username, 'unhashed')
-      expect(result).toBe(false)
+      const result = await service.verify('username', 'unhashed')
+      expect(result).toBeNull()
     })
   })
 })

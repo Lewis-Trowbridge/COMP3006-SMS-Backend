@@ -17,6 +17,21 @@ const createPost = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
+const loginPost = async (req: Request, res: Response): Promise<void> => {
+  const {
+    username,
+    password
+  } = req.body
+  const verified = await service.verify(username, password)
+  if (verified != null) {
+    req.session.user = verified
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(401)
+  }
+}
+
 export {
-  createPost
+  createPost,
+  loginPost
 }

@@ -46,6 +46,7 @@ describe('User routes (Integration test)', () => {
 
 afterEach(async () => {
   await mongoUnit.drop()
+  await User.syncIndexes()
 })
 
 afterAll(async () => {

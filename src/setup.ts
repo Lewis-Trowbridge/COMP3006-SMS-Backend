@@ -8,6 +8,7 @@ import { connect } from 'mongoose'
 import { URLS } from './constants'
 import itemRoutes from './setup/routes/itemRoutes'
 import shoppingListRoutes from './setup/routes/shoppingListRoutes'
+import userRoutes from './setup/routes/userRoutes'
 import { resolveChangesSetupSocket } from './controllers/ShoppingListController'
 
 const app: express.Express = express()
@@ -17,6 +18,7 @@ app.use(cors({
 app.use(bodyParser.json({}))
 app.use('/items', itemRoutes)
 app.use('/lists', shoppingListRoutes)
+app.use('/users', userRoutes)
 
 const server: http.Server = http.createServer(app)
 

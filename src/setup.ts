@@ -13,6 +13,10 @@ import { resolveChangesSetupSocket } from './controllers/ShoppingListController'
 import { IUser } from './models/User'
 import session from 'express-session'
 
+if (sessionSecret === undefined) {
+  throw new Error('SessionSecret environment variable not set.')
+}
+
 const app: express.Express = express()
 app.use(cors({
   origin: URLS.ALLOWED_ORIGIN

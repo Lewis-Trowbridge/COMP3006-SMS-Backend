@@ -8,7 +8,7 @@ const URLS = {
   PORT: (process.env.PORT != null) ? parseInt(process.env.PORT) : 9000
 }
 
-const sessionSecret = process.env.SessionSecret ??= ''
+const sessionSecret = process.env.SessionSecret
 
 const mongoExcludeVersionToObjectOptions: ToObjectOptions = {
   versionKey: false

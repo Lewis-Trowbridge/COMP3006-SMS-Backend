@@ -5,20 +5,33 @@ import http from 'http'
 import SocketIO from 'socket.io'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from './setup/socketEvents'
 import { connect } from 'mongoose'
-import { URLS } from './constants'
+import { sessionSecret, URLS } from './constants'
 import itemRoutes from './setup/routes/itemRoutes'
 import shoppingListRoutes from './setup/routes/shoppingListRoutes'
 import userRoutes from './setup/routes/userRoutes'
 import { resolveChangesSetupSocket } from './controllers/ShoppingListController'
+import { IUser } from './models/User'
+import session from 'express-session'
+
+if (sessionSecret === undefined) {
+  throw new Error('SessionSecret environment variable not set.')
+}
 
 const app: express.Express = express()
 app.use(cors({
   origin: URLS.ALLOWED_ORIGIN
 }))
 app.use(bodyParser.json({}))
+app.use(session({ secret: sessionSecret }))
 app.use('/items', itemRoutes)
 app.use('/lists', shoppingListRoutes)
 app.use('/users', userRoutes)
+
+declare module 'express-session' {
+  interface SessionData {
+    user: IUser
+  }
+}
 
 const server: http.Server = http.createServer(app)
 

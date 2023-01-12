@@ -47,7 +47,7 @@ describe('User routes (Integration test)', () => {
   })
 
   describe('POST /login', () => {
-    it('login endpoint returns HTTP 200 and sets session token on successful login', async () => {
+    it('returns HTTP 200 and sets session token on successful login', async () => {
       const request = supertest(testApp)
       const plaintextPassword = 'securepassword'
       const existingUser = await User.create({ password: await hash(plaintextPassword), type: UserType.Customer, username: 'user' })
@@ -60,6 +60,21 @@ describe('User routes (Integration test)', () => {
       expect(response.statusCode).toBe(200)
       expect(response.headers['set-cookie']).toHaveLength(1)
     }, 10000)
+  })
+
+  describe('GET /search', () => {
+    it('returns HTTP 200 and a list of usernames', async () => {
+      const request = supertest(testApp)
+      const expectedUsername = 'user'
+      await User.create({ password: 'password', type: UserType.Customer, username: expectedUsername })
+
+      const response = await request.get('/users/search')
+        .query({ name: expectedUsername })
+        .send()
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toEqual([expectedUsername])
+    })
   })
 })
 

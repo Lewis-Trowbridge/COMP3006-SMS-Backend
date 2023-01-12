@@ -2,7 +2,7 @@ import { mock } from 'jest-mock-extended'
 import { HydratedDocument } from 'mongoose'
 import { IUser, UserType } from '../../models/User'
 import UserService from '../../services/UserService'
-import { createPost, loginPost } from '../UserController'
+import { createPost, loginPost, searchGet } from '../UserController'
 import { Request, Response } from 'express'
 import mocked = jest.mocked
 
@@ -19,7 +19,9 @@ describe('UserController', () => {
       const expectedUser = { password: 'password', username: 'username' }
       const mockRequest = mock<Request>({ body: expectedUser })
       const mockResponse = mock<Response>({ sendStatus: jest.fn() })
+
       await createPost(mockRequest, mockResponse)
+
       expect(mockUserService.prototype.create).toHaveBeenCalledTimes(1)
       expect(mockUserService.prototype.create).toHaveBeenNthCalledWith(1, expectedUser.username, expectedUser.password, UserType.Customer)
     })
@@ -31,7 +33,9 @@ describe('UserController', () => {
       const mockRequest = mock<Request>({ body: expectedUser })
       const mockSendStatusFunc = jest.fn()
       const mockResponse = mock<Response>({ sendStatus: mockSendStatusFunc })
+
       await createPost(mockRequest, mockResponse)
+
       expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
       expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 201)
     })
@@ -42,7 +46,9 @@ describe('UserController', () => {
       const mockRequest = mock<Request>({ body: expectedUser })
       const mockSendStatusFunc = jest.fn()
       const mockResponse = mock<Response>({ sendStatus: mockSendStatusFunc })
+
       await createPost(mockRequest, mockResponse)
+
       expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
       expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 304)
     })
@@ -56,7 +62,9 @@ describe('UserController', () => {
       const mockRequest = mock<Request>({ body: { password: expectedUser.password, username: expectedUser.username } })
       const mockSendStatusFunc = jest.fn()
       const mockResponse = mock<Response>({ sendStatus: mockSendStatusFunc })
+
       await loginPost(mockRequest, mockResponse)
+
       expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
       expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 200)
       expect(mockRequest.session.user).toEqual(expectedResponse)
@@ -72,6 +80,21 @@ describe('UserController', () => {
       expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
       expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 401)
       expect(mockRequest.session.user).toBeUndefined()
+    })
+  })
+
+  describe('searchGet', () => {
+    it('returns HTTP 200 and list of usernames returned from service', async () => {
+      const expectedResponse = ['user']
+      mockUserService.prototype.search.mockResolvedValue(expectedResponse)
+      const mockRequest = mock<Request<{}, {}, {}, { name: string }>>({ query: { name: expectedResponse[0] } })
+      const mockJsonFunc = jest.fn()
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
+
+      await searchGet(mockRequest, mockResponse)
+
+      expect(mockJsonFunc).toHaveBeenCalledTimes(1)
+      expect(mockJsonFunc).toHaveBeenNthCalledWith(1, expectedResponse)
     })
   })
 })

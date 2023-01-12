@@ -31,7 +31,13 @@ const loginPost = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
+const searchGet = async (req: Request<{}, {}, {}, { name: string }>, res: Response): Promise<void> => {
+  const result = await service.search(req.query.name)
+  res.status(200).json(result)
+}
+
 export {
   createPost,
-  loginPost
+  loginPost,
+  searchGet
 }

@@ -37,6 +37,7 @@ const mongoStore = new MongoStore({
 
 const app: express.Express = express()
 app.use(cors({
+  credentials: true,
   origin: URLS.ALLOWED_ORIGIN
 }))
 app.use(bodyParser.json({}))

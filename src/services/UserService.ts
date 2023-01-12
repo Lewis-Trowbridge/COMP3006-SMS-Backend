@@ -21,7 +21,7 @@ export default class UserService {
 
   async search (query: string): Promise<string[]> {
     const searchRegex = new RegExp(escapeStringRegexp(query) + '*.')
-    const foundUsers = await User.find({ username: { $regex: searchRegex } }).limit(5)
+    const foundUsers = await User.find({ type: UserType.Customer, username: { $regex: searchRegex } }).limit(5)
     return foundUsers.map(user => user.username)
   }
 

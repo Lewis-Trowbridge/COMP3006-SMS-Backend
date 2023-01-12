@@ -52,7 +52,7 @@ describe('SOCKET resolve changes', () => {
 
     await ShoppingList.create({ _id: listId, created: new Date(), ownerId: new Types.ObjectId() })
     const newChanges: IShoppingListItem = {
-      id: new Types.ObjectId().toString(),
+      _id: new Types.ObjectId(),
       quantity: 2,
       text: 'newText'
     }

@@ -5,20 +5,16 @@ import { IShoppingListItem } from '../../models/customer/ShoppingListItem'
 import { User } from '../../models/User'
 
 export default class ShoppingListService {
-  async new (): Promise<HydratedDocument<IShoppingList>> {
-    // TODO: Replace with session value when implemented
-    const userId = new Types.ObjectId()
-    return await ShoppingList.create({ ownerId: userId })
+  async new (ownerId: string): Promise<HydratedDocument<IShoppingList>> {
+    return await ShoppingList.create({ ownerId })
   }
 
   async get (listId: string): Promise<HydratedDocument<IShoppingList> | null> {
     return await ShoppingList.findById(listId)
   }
 
-  async listAll (): Promise<Array<HydratedDocument<IShoppingList>>> {
-    // TODO: Replace with session value when implemented
-    const userId = new Types.ObjectId()
-    return await ShoppingList.find({ ownerId: userId })
+  async listAll (ownerId: string): Promise<Array<HydratedDocument<IShoppingList>>> {
+    return await ShoppingList.find({ ownerId })
   }
 
   async addEditor (userId: string, listId: Types.ObjectId): Promise<void> {

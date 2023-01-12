@@ -2,11 +2,13 @@ import mongoUnit from 'mongo-unit'
 import { connect, connection, Types } from 'mongoose'
 // Import without using to patch Express
 import 'express-async-errors'
-import express from 'express'
+import express, { Application, Request, Response } from 'express'
 import bodyParser from 'body-parser'
 import shoppingListRoutes from '../shoppingListRoutes'
-import supertest from 'supertest'
+import supertest, { SuperAgentTest } from 'supertest'
 import { ShoppingList } from '../../../models/customer/ShoppingList'
+import session from 'express-session'
+import { User, UserType } from '../../../models/User'
 
 const currentTime = new Date(2022, 1, 1)
 
@@ -18,24 +20,40 @@ beforeAll(async () => {
   await connect(mongoUnit.getUrl())
 }, 30000)
 
-const testApp = express()
-testApp.use(bodyParser.json({}))
-testApp.use('/lists', shoppingListRoutes)
+let testApp: Application
+let agent: SuperAgentTest
+const fakeUser = new User({
+  _id: new Types.ObjectId(),
+  password: 'pass',
+  type: UserType.Customer,
+  username: 'user'
+})
+
+beforeEach(async () => {
+  testApp = express()
+  testApp.use(bodyParser.json({}))
+  testApp.use(session({ secret: 'testSecret' }))
+  testApp.use('/lists', shoppingListRoutes)
+  testApp.get('/login', (req: Request, res: Response) => {
+    req.session.user = fakeUser
+    res.sendStatus(200)
+  })
+  agent = supertest.agent(testApp)
+  await agent.get('/login').send()
+}, 10000)
 
 describe('Shopping list routes (integration tests)', () => {
   describe('POST /new', () => {
     it('returns HTTP 201 and a new shopping list owned by the current user', async () => {
-      const mockUserId = new Types.ObjectId().toString()
-      const request = supertest(testApp)
       const expectedObject = {
         _id: expect.any(String),
         created: currentTime.toISOString(),
         editors: [],
         items: [],
-        ownerId: mockUserId,
+        ownerId: fakeUser._id.toString(),
         updated: currentTime.toISOString()
       }
-      const response = await request.post('/lists/create')
+      const response = await agent.post('/lists/create')
         .send()
 
       expect(response.status).toBe(201)
@@ -70,21 +88,19 @@ describe('Shopping list routes (integration tests)', () => {
 
   describe('GET /list-all', () => {
     it('returns HTTP 200 and a shopping lists owned by the current user', async () => {
-      const mockUserId = new Types.ObjectId().toString()
-      const request = supertest(testApp)
       const item = await ShoppingList.create({
         created: currentTime,
-        ownerId: mockUserId
+        ownerId: fakeUser._id
       })
       const expectedObject = {
         _id: item._id.toString(),
         created: currentTime.toISOString(),
         editors: [],
         items: [],
-        ownerId: mockUserId,
+        ownerId: item.ownerId.toString(),
         updated: currentTime.toISOString()
       }
-      const response = await request.get('/lists/list-all')
+      const response = await agent.get('/lists/list-all')
         .send()
 
       expect(response.status).toBe(200)
@@ -94,16 +110,14 @@ describe('Shopping list routes (integration tests)', () => {
 
   describe('PATCH /add-editor', () => {
     it('Returns HTTP 204 and adds a given user to a given list', async () => {
-      const request = supertest(testApp)
-      const mockOwnerId = new Types.ObjectId().toString()
-      const mockEditorId = new Types.ObjectId().toString()
-      const testList = await ShoppingList.create({ created: currentTime, ownerId: mockOwnerId })
+      const fakeEditor = await User.create({ _id: new Types.ObjectId(), password: 'pass', type: UserType.Customer, username: 'editor' })
+      const testList = await ShoppingList.create({ created: currentTime, ownerId: fakeUser._id })
       const expectedObject = {
-        listId: testList.id.toString(),
-        userId: mockEditorId
+        listId: testList.id,
+        userId: fakeEditor.id
       }
 
-      const response = await request.patch('/lists/add-editor')
+      const response = await agent.patch('/lists/add-editor')
         .type('form')
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
@@ -112,7 +126,7 @@ describe('Shopping list routes (integration tests)', () => {
       const updatedList = await ShoppingList.findById(expectedObject.listId)
 
       expect(response.status).toBe(204)
-      expect(updatedList?.editors).toContain(mockEditorId)
+      expect(updatedList?.editors).toContainEqual(fakeEditor._id)
     }, 10000)
 
     it('returns HTTP 400 and error when given missing ids', async () => {

@@ -5,6 +5,7 @@ import { Request, Response } from 'express'
 import { addEditorPatch, getListGet, listAllGet, newPost } from '../ShoppingListController'
 import { HydratedDocument, Types } from 'mongoose'
 import { IShoppingList } from '../../models/customer/ShoppingList'
+import { IUser } from 'src/models/User'
 
 jest.mock('../../services/customer/ShoppingListService')
 
@@ -12,21 +13,24 @@ const mockShoppingListService = mocked(ShoppingListService)
 
 describe('ShoppingListController', () => {
   describe('newPost', () => {
-    it('calls shopping list service\'s "new" method', async () => {
+    it('calls shopping list service\'s "new" method with session user id', async () => {
       const expectedResponse = mock<HydratedDocument<IShoppingList>>()
       expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockShoppingListService.prototype?.new.mockResolvedValue(expectedResponse)
-      const mockRequest = mock<Request>()
+      const mockUserId = new Types.ObjectId()
+      const mockRequest = mock<Request>({ session: { user: mock<IUser>({ _id: mockUserId }) } })
       const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: jest.fn() }) })
       await newPost(mockRequest, mockResponse)
       expect(mockShoppingListService.prototype?.new).toHaveBeenCalledTimes(1)
+      expect(mockShoppingListService.prototype.new).toHaveBeenNthCalledWith(1, mockUserId.toString())
     })
 
     it('returns response from ShoppingListService new', async () => {
       const expectedResponse = mock<HydratedDocument<IShoppingList>>()
       expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockShoppingListService.prototype?.new.mockResolvedValue(expectedResponse)
-      const mockRequest = mock<Request>()
+      const mockUserId = new Types.ObjectId()
+      const mockRequest = mock<Request>({ session: { user: mock<IUser>({ _id: mockUserId }) } })
       const mockJsonFunc = jest.fn().mockReturnValue({ send: jest.fn() })
       const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
 
@@ -85,7 +89,8 @@ describe('ShoppingListController', () => {
       const expectedResponse = mock<HydratedDocument<IShoppingList>>()
       expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockShoppingListService.prototype?.listAll.mockResolvedValue([expectedResponse])
-      const mockRequest = mock<Request>()
+      const mockUserId = new Types.ObjectId()
+      const mockRequest = mock<Request>({ session: { user: mock<IUser>({ _id: mockUserId }) } })
       const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: jest.fn() }) })
       await listAllGet(mockRequest, mockResponse)
       expect(mockShoppingListService.prototype?.listAll).toHaveBeenCalledTimes(1)
@@ -95,7 +100,8 @@ describe('ShoppingListController', () => {
       const expectedResponse = mock<HydratedDocument<IShoppingList>>()
       expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockShoppingListService.prototype?.listAll.mockResolvedValue([expectedResponse])
-      const mockRequest = mock<Request>()
+      const mockUserId = new Types.ObjectId()
+      const mockRequest = mock<Request>({ session: { user: mock<IUser>({ _id: mockUserId }) } })
       const mockJsonFunc = jest.fn()
       const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
 

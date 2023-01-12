@@ -28,7 +28,7 @@ describe('ShoppingListService', () => {
       })
       mockingoose(ShoppingList)
       const service = new ShoppingListService()
-      const actual = await service.new()
+      const actual = await service.new(testUserId)
       expect(actual.toObject(mongoExcludeIdsToObjectOptions))
         .toEqual(expected.toObject(mongoExcludeIdsToObjectOptions))
     })
@@ -42,17 +42,17 @@ describe('ShoppingListService', () => {
       })
       mockingoose(ShoppingList).toReturn([expected], 'find')
       const service = new ShoppingListService()
-      const actual = await service.listAll()
+      const actual = await service.listAll(testUserId)
       expect(actual.length).toBe(1)
       expect(actual[0].toObject())
         .toEqual(expected.toObject())
     })
 
     it('returns an empty list when no lists belong to the user', async () => {
-      // const testUserId = 'user'
+      const testUserId = 'user'
       mockingoose(ShoppingList).toReturn([], 'find')
       const service = new ShoppingListService()
-      const actual = await service.listAll()
+      const actual = await service.listAll(testUserId)
       expect(actual.length).toBe(0)
     })
   })

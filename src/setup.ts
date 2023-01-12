@@ -12,26 +12,46 @@ import userRoutes from './setup/routes/userRoutes'
 import { resolveChangesSetupSocket } from './controllers/ShoppingListController'
 import { IUser } from './models/User'
 import session from 'express-session'
+import connectMongo from 'connect-mongodb-session'
+
+// Add user info to Typescript config for session
+declare module 'express-session' {
+  interface SessionData {
+    user: IUser
+  }
+}
+
+// Setup mongo store library with session library
+const MongoStore = connectMongo(session)
 
 if (sessionSecret === undefined) {
   throw new Error('SessionSecret environment variable not set.')
 }
+
+const mongoStore = new MongoStore({
+  collection: 'sessions',
+  uri: URLS.MONGO
+})
 
 const app: express.Express = express()
 app.use(cors({
   origin: URLS.ALLOWED_ORIGIN
 }))
 app.use(bodyParser.json({}))
-app.use(session({ secret: sessionSecret }))
+app.use(session({
+  cookie: {
+    // Set age to 1 hour
+    maxAge: 1000 * 60 * 60
+  },
+  resave: true,
+  saveUninitialized: true,
+  secret: sessionSecret,
+  store: mongoStore
+
+}))
 app.use('/items', itemRoutes)
 app.use('/lists', shoppingListRoutes)
 app.use('/users', userRoutes)
-
-declare module 'express-session' {
-  interface SessionData {
-    user: IUser
-  }
-}
 
 const server: http.Server = http.createServer(app)
 

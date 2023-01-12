@@ -1,18 +1,19 @@
 import { IShoppingListItem, ShoppingListItemSchema } from './ShoppingListItem'
 import { model, Model, Schema, Types } from 'mongoose'
+import { IUser } from '../User'
 
 interface IShoppingList {
-  ownerId: string
-  editors: string[]
+  ownerId: IUser['_id']
+  editors: Array<IUser['_id']>
   created: Date
   updated: Date
   items: IShoppingListItem[]
 }
 
 const ShoppingListSchema = new Schema<IShoppingList>({
-  editors: { default: [], required: true, type: [String] },
+  editors: [{ ref: 'users', required: true, type: Schema.Types.ObjectId }],
   items: { default: [], required: true, type: [ShoppingListItemSchema] },
-  ownerId: { required: true, type: String }
+  ownerId: { ref: 'users', required: true, type: Schema.Types.ObjectId }
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 // Workaround for Mongoose in Typescript: https://mongoosejs.com/docs/typescript/subdocuments.html

@@ -2,6 +2,8 @@ import supertest from 'supertest'
 import { connect, connection } from 'mongoose'
 import mongoUnit from 'mongo-unit'
 import bodyParser from 'body-parser'
+// Import without using to patch Express
+import 'express-async-errors'
 import express from 'express'
 import userRoutes from '../userRoutes'
 import { User, UserType } from '../../../models/User'

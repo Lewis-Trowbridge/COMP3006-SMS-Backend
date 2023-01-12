@@ -16,6 +16,14 @@ import { IUser } from './models/User'
 import session from 'express-session'
 import connectMongo from 'connect-mongodb-session'
 
+// Add user info to Typescript config for session
+declare module 'express-session' {
+  interface SessionData {
+    user: IUser
+  }
+}
+
+// Setup mongo store library with session library
 const MongoStore = connectMongo(session)
 
 if (sessionSecret === undefined) {
@@ -46,12 +54,6 @@ app.use(session({
 app.use('/items', itemRoutes)
 app.use('/lists', shoppingListRoutes)
 app.use('/users', userRoutes)
-
-declare module 'express-session' {
-  interface SessionData {
-    user: IUser
-  }
-}
 
 const server: http.Server = http.createServer(app)
 

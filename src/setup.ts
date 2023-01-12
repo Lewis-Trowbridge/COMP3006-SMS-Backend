@@ -1,3 +1,5 @@
+// Import without using to patch Express
+import 'express-async-errors'
 import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'

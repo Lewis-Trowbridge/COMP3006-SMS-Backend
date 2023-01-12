@@ -1,8 +1,9 @@
 import mocked = jest.mocked
 import { hash, verify } from 'argon2'
 import { mongoExcludeIdsToObjectOptions } from '../../constants'
-import { User, UserType } from '../../models/User'
+import { IUser, User, UserType } from '../../models/User'
 import UserService from '../UserService'
+import { mock } from 'jest-mock-extended'
 // Mockingoose does not work with ES6 imports: https://stackoverflow.com/questions/70156753/typeerror-0-mockingoose-default-is-not-a-function-mockingooose
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose')
@@ -68,6 +69,19 @@ describe('UserService', () => {
 
       const result = await service.verify('username', 'unhashed')
       expect(result).toBeNull()
+    })
+  })
+
+  describe('search', () => {
+    it('returns a list of found usernames', async () => {
+      const expectedUsername = 'user'
+      const expectedUser = mock<IUser>({ username: expectedUsername })
+      mockingoose(User).toReturn([expectedUser], 'find')
+      const service = new UserService()
+
+      const actual = await service.search(expectedUsername)
+
+      expect(actual).toContain(expectedUsername)
     })
   })
 })

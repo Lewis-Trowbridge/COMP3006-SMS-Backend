@@ -1,3 +1,4 @@
+import escapeStringRegexp from '@esm2cjs/escape-string-regexp'
 import { hash, verify } from 'argon2'
 import { HydratedDocument } from 'mongoose'
 import { IUser, User, UserType } from '../models/User'
@@ -16,6 +17,12 @@ export default class UserService {
       }
     }
     return null
+  }
+
+  async search (query: string): Promise<string[]> {
+    const searchRegex = new RegExp(escapeStringRegexp(query) + '*.')
+    const foundUsers = await User.find({ username: { $regex: searchRegex } }).limit(5)
+    return foundUsers.map(user => user.username)
   }
 
   private async hashPassword (password: string): Promise<string> {

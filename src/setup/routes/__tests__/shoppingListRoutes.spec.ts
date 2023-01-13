@@ -114,7 +114,7 @@ describe('Shopping list routes (integration tests)', () => {
       const testList = await ShoppingList.create({ created: currentTime, ownerId: fakeUser._id })
       const expectedObject = {
         listId: testList.id,
-        userId: fakeEditor.id
+        userId: fakeEditor.username
       }
 
       const response = await agent.patch('/lists/add-editor')

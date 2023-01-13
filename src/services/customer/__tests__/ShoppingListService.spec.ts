@@ -93,7 +93,7 @@ describe('ShoppingListService', () => {
 
       const service = new ShoppingListService()
 
-      await service.addEditor(testUserId.toString(), fakeList.id)
+      await service.addEditor(fakeValidUser.username, fakeList.id)
 
       expect(fakeList.editors).toContainEqual(testUserId)
     })

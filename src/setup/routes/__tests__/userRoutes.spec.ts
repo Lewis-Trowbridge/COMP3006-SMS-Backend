@@ -32,6 +32,7 @@ describe('User routes (Integration test)', () => {
         .send({ password: 'unhashed', username: 'username' })
 
       expect(response.statusCode).toBe(201)
+      expect(response.body).toEqual({ type: UserType.Customer })
     }, 10000)
 
     it('create endpoint returns HTTP 304 on duplicate user', async () => {

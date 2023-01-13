@@ -26,18 +26,19 @@ describe('UserController', () => {
       expect(mockUserService.prototype.create).toHaveBeenNthCalledWith(1, expectedUser.username, expectedUser.password, UserType.Customer)
     })
 
-    it('returns HTTP 201 when user service\'s "create" method does not throw', async () => {
-      const expectedResponse = mock<HydratedDocument<IUser>>()
+    it('returns HTTP 201 with user type and stores user in session when user service\'s "create" method does not throw', async () => {
+      const expectedResponse = mock<HydratedDocument<IUser>>({ type: UserType.Customer })
       mockUserService.prototype.create.mockResolvedValue(expectedResponse)
       const expectedUser = { password: 'password', username: 'username' }
       const mockRequest = mock<Request>({ body: expectedUser })
-      const mockSendStatusFunc = jest.fn()
-      const mockResponse = mock<Response>({ sendStatus: mockSendStatusFunc })
+      const mockJsonFunc = jest.fn()
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
 
       await createPost(mockRequest, mockResponse)
 
-      expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
-      expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 201)
+      expect(mockJsonFunc).toHaveBeenCalledTimes(1)
+      expect(mockJsonFunc).toHaveBeenNthCalledWith(1, { type: expectedResponse.type })
+      expect(mockRequest.session.user).toEqual(expectedResponse)
     })
 
     it('returns HTTP 304 when user service\'s "create" method throws', async () => {

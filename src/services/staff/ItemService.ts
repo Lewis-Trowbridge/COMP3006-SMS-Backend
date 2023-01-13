@@ -14,6 +14,10 @@ export default class ItemService {
     return await Item.create({ barcode, name, position, stock })
   }
 
+  async listAll (): Promise<Array<HydratedDocument<IItem>>> {
+    return await Item.find()
+  }
+
   async findByBarcode (barcode: string): Promise<HydratedDocument<IItem> | null> {
     return await Item.findOne({ barcode })
   }

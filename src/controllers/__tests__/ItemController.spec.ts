@@ -1,6 +1,6 @@
 import ItemService from '../../services/staff/ItemService'
 import mocked = jest.mocked
-import { createPost, findByBarcodeGet, findByNameGet } from '../ItemController'
+import { createPost, findByBarcodeGet, findByNameGet, listAllGet } from '../ItemController'
 import { mock } from 'jest-mock-extended'
 import { Request, Response } from 'express'
 import { HydratedDocument } from 'mongoose'
@@ -56,6 +56,22 @@ describe('ItemController', () => {
 
       expect(mockJsonFunc).toHaveBeenCalledTimes(1)
       expect(mockJsonFunc).toHaveBeenNthCalledWith(1, expectedResponse)
+    })
+  })
+
+  describe('listAll', () => {
+    it('returns response from service listAll', async () => {
+      const mockRequest = mock<Request>()
+      const expectedResponse = mock<HydratedDocument<IItem>>()
+      expectedResponse.toObject.mockReturnValue(expectedResponse)
+      mockItemService.prototype?.listAll.mockResolvedValue([expectedResponse])
+      const mockJsonFunc = jest.fn()
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
+
+      await listAllGet(mockRequest, mockResponse)
+
+      expect(mockJsonFunc).toHaveBeenCalledTimes(1)
+      expect(mockJsonFunc).toHaveBeenNthCalledWith(1, [expectedResponse])
     })
   })
 

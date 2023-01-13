@@ -17,9 +17,9 @@ export default class ShoppingListService {
     return await ShoppingList.find({ ownerId })
   }
 
-  async addEditor (userId: string, listId: Types.ObjectId): Promise<void> {
+  async addEditor (username: string, listId: Types.ObjectId): Promise<void> {
     const list = await ShoppingList.findById(listId)
-    const userToAdd = await User.findById(userId)
+    const userToAdd = await User.findOne({ username })
     if (list == null) {
       throw new Api404Error('List not found.')
     }

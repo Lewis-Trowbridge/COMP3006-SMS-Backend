@@ -26,7 +26,7 @@ describe('UserController', () => {
       expect(mockUserService.prototype.create).toHaveBeenNthCalledWith(1, expectedUser.username, expectedUser.password, UserType.Customer)
     })
 
-    it('returns HTTP 201 when user service\'s "create" method does not throw', async () => {
+    it('returns HTTP 201 and stores user in session when user service\'s "create" method does not throw', async () => {
       const expectedResponse = mock<HydratedDocument<IUser>>()
       mockUserService.prototype.create.mockResolvedValue(expectedResponse)
       const expectedUser = { password: 'password', username: 'username' }
@@ -38,6 +38,7 @@ describe('UserController', () => {
 
       expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
       expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 201)
+      expect(mockRequest.session.user).toEqual(expectedResponse)
     })
 
     it('returns HTTP 304 when user service\'s "create" method throws', async () => {

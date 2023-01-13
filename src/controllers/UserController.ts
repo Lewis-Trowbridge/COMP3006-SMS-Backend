@@ -10,7 +10,8 @@ const createPost = async (req: Request, res: Response): Promise<void> => {
     password
   } = req.body
   try {
-    await service.create(username, password, UserType.Customer)
+    const user = await service.create(username, password, UserType.Customer)
+    req.session.user = user
     res.sendStatus(201)
   } catch {
     res.sendStatus(304)

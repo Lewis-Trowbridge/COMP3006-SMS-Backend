@@ -37,6 +37,7 @@ const mongoStore = new MongoStore({
 
 const app: express.Express = express()
 app.use(cors({
+  credentials: true,
   origin: URLS.ALLOWED_ORIGIN
 }))
 app.use(bodyParser.json({}))
@@ -59,6 +60,7 @@ const server: http.Server = http.createServer(app)
 
 const io = new SocketIO.Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(server, {
   cors: {
+    credentials: true,
     // Despite information online, Socket.io CORS does not appear to work with multiple origins
     origin: URLS.ALLOWED_ORIGIN
   }

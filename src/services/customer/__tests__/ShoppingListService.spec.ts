@@ -5,6 +5,7 @@ import { Types } from 'mongoose'
 import { Api304Error, Api404Error } from '../../../setup/exceptions'
 import { IShoppingListItem } from '../../../models/customer/ShoppingListItem'
 import { mock } from 'jest-mock-extended'
+import { User, UserType } from '../../../models/User'
 // Mockingoose does not work with ES6 imports: https://stackoverflow.com/questions/70156753/typeerror-0-mockingoose-default-is-not-a-function-mockingooose
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose')
@@ -27,7 +28,7 @@ describe('ShoppingListService', () => {
       })
       mockingoose(ShoppingList)
       const service = new ShoppingListService()
-      const actual = await service.new()
+      const actual = await service.new(testUserId)
       expect(actual.toObject(mongoExcludeIdsToObjectOptions))
         .toEqual(expected.toObject(mongoExcludeIdsToObjectOptions))
     })
@@ -41,17 +42,17 @@ describe('ShoppingListService', () => {
       })
       mockingoose(ShoppingList).toReturn([expected], 'find')
       const service = new ShoppingListService()
-      const actual = await service.listAll()
+      const actual = await service.listAll(testUserId)
       expect(actual.length).toBe(1)
       expect(actual[0].toObject())
         .toEqual(expected.toObject())
     })
 
     it('returns an empty list when no lists belong to the user', async () => {
-      // const testUserId = 'user'
+      const testUserId = 'user'
       mockingoose(ShoppingList).toReturn([], 'find')
       const service = new ShoppingListService()
-      const actual = await service.listAll()
+      const actual = await service.listAll(testUserId)
       expect(actual.length).toBe(0)
     })
   })
@@ -81,16 +82,20 @@ describe('ShoppingListService', () => {
   })
 
   describe('addEditor', () => {
+    const testUserId = new Types.ObjectId()
+    const fakeValidUser = new User({ _id: testUserId, password: 'pass', type: UserType.Customer, username: 'user' })
+
     it('adds a new user to a given list', async () => {
-      const ownerId = 'user'
-      const testUserId = 'anotherUser'
-      const fakeList = new ShoppingList({ created: new Date(), ownerId })
+      const ownerId = new Types.ObjectId()
+      const fakeList = new ShoppingList({ created: new Date(), editors: [], ownerId })
       mockingoose(ShoppingList).toReturn(fakeList, 'findOne')
+      mockingoose(User).toReturn(fakeValidUser, 'findOne')
+
       const service = new ShoppingListService()
 
-      await service.addEditor(testUserId, fakeList.id)
+      await service.addEditor(testUserId.toString(), fakeList.id)
 
-      expect(fakeList.editors).toContain(testUserId)
+      expect(fakeList.editors).toContainEqual(testUserId)
     })
 
     it('throws a 404 error when the list is not found', async () => {
@@ -102,20 +107,20 @@ describe('ShoppingListService', () => {
 
     it('throws a 304 error when the list already has a given user', async () => {
       const ownerId = 'user'
-      const testUserId = 'anotherUser'
       const fakeList = new ShoppingList({ created: new Date(), editors: [testUserId], ownerId })
       mockingoose(ShoppingList).toReturn(fakeList, 'findOne')
+      mockingoose(User).toReturn(fakeValidUser, 'findOne')
       const service = new ShoppingListService()
-      await expect(async () => await service.addEditor(testUserId, fakeList.id))
+      await expect(async () => await service.addEditor(testUserId.toString(), fakeList.id))
         .rejects.toThrow(new Api304Error('User already has permission to edit this list.'))
     })
 
     it('throws a 304 error when the list belongs to the given user', async () => {
-      const ownerId = 'user'
-      const fakeList = new ShoppingList({ created: new Date(), ownerId })
+      const fakeList = new ShoppingList({ created: new Date(), ownerId: testUserId })
       mockingoose(ShoppingList).toReturn(fakeList, 'findOne')
+      mockingoose(User).toReturn(fakeValidUser, 'findOne')
       const service = new ShoppingListService()
-      await expect(async () => await service.addEditor(ownerId, fakeList.id))
+      await expect(async () => await service.addEditor(testUserId.toString(), fakeList.id))
         .rejects.toThrow(new Api304Error('User already has permission to edit this list.'))
     })
   })

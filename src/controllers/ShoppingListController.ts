@@ -7,7 +7,8 @@ import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from '.
 const service = new ShoppingListService()
 
 const newPost = async (req: Request, res: Response): Promise<void> => {
-  const result = await service.new()
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const result = await service.new(req.session.user!._id.toString())
   res.status(201).json(result.toObject(mongoExcludeVersionToObjectOptions))
 }
 
@@ -22,7 +23,8 @@ const getListGet = async (req: Request<{}, {}, {}, { listId: string }>, res: Res
 }
 
 const listAllGet = async (req: Request, res: Response): Promise<void> => {
-  const results = await service.listAll()
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const results = await service.listAll(req.session.user!._id.toString())
   res.status(200).json(results.map(result => result.toObject(mongoExcludeVersionToObjectOptions)))
 }
 

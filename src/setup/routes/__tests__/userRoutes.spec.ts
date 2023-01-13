@@ -2,6 +2,8 @@ import supertest from 'supertest'
 import { connect, connection } from 'mongoose'
 import mongoUnit from 'mongo-unit'
 import bodyParser from 'body-parser'
+// Import without using to patch Express
+import 'express-async-errors'
 import express from 'express'
 import userRoutes from '../userRoutes'
 import { User, UserType } from '../../../models/User'
@@ -58,6 +60,7 @@ describe('User routes (Integration test)', () => {
         .send({ password: plaintextPassword, username: existingUser.username })
 
       expect(response.statusCode).toBe(200)
+      expect(response.body).toEqual({ type: existingUser.type })
       expect(response.headers['set-cookie']).toHaveLength(1)
     }, 10000)
   })

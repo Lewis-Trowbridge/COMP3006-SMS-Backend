@@ -4,7 +4,7 @@ import { createPost, findByBarcodeGet, findByNameGet, listAllGet } from '../Item
 import { mock } from 'jest-mock-extended'
 import { Request, Response } from 'express'
 import { HydratedDocument } from 'mongoose'
-import { IItem, Item } from '../../models/staff/Item'
+import { IItem } from '../../models/staff/Item'
 
 jest.mock('../../services/staff/ItemService')
 

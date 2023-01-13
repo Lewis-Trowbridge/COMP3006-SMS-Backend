@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import itemRoutes from '../itemRoutes'
-import { connect, connection } from 'mongoose'
+import { connect, connection, Types } from 'mongoose'
 import mongoUnit from 'mongo-unit'
 import bodyParser from 'body-parser'
 import express from 'express'
@@ -12,10 +12,16 @@ beforeAll(async () => {
 }, 30000)
 
 const validItemObject = {
+  _id: new Types.ObjectId().toString(),
   barcode: 'barcode',
   name: 'name',
   position: 'position',
   stock: 0
+}
+
+const unknownIdValidItemObject = {
+  ...validItemObject,
+  _id: expect.any(String)
 }
 
 const testApp = express()
@@ -39,7 +45,7 @@ describe('Item routes (integration tests)', () => {
         .send(expectedObject)
 
       expect(response.status).toBe(201)
-      expect(response.body).toEqual(expectedObject)
+      expect(response.body).toEqual(unknownIdValidItemObject)
     }, 10000)
 
     it('returns HTTP 400 when given a stock number below 0', async () => {
@@ -151,6 +157,19 @@ describe('Item routes (integration tests)', () => {
 
     expect(response.status).toBe(400)
     expect(response.body).toEqual(expectedError)
+  })
+
+  describe('GET /list-all', () => {
+    it('returns HTTP 200 and valid response with valid data', async () => {
+      const request = supertest(testApp)
+      await Item.create(validItemObject)
+
+      const response = await request.get('/items/list-all')
+        .send()
+
+      expect(response.status).toBe(200)
+      expect(response.body).toEqual([validItemObject])
+    })
   })
 
   describe('GET /find-barcode', () => {

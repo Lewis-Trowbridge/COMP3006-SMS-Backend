@@ -60,6 +60,7 @@ describe('User routes (Integration test)', () => {
         .send({ password: plaintextPassword, username: existingUser.username })
 
       expect(response.statusCode).toBe(200)
+      expect(response.body).toEqual({ type: existingUser.type })
       expect(response.headers['set-cookie']).toHaveLength(1)
     }, 10000)
   })

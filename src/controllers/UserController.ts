@@ -25,7 +25,7 @@ const loginPost = async (req: Request, res: Response): Promise<void> => {
   const verified = await service.verify(username, password)
   if (verified != null) {
     req.session.user = verified
-    res.sendStatus(200)
+    res.status(200).json({ type: verified.type })
   } else {
     res.sendStatus(401)
   }

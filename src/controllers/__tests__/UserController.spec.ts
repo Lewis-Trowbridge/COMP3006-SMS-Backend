@@ -55,18 +55,19 @@ describe('UserController', () => {
   })
 
   describe('loginPost', () => {
-    it('returns HTTP 200 and stores user data in session when verify returns data', async () => {
-      const expectedResponse = mock<HydratedDocument<IUser>>()
+    it('returns type and stores user data in session when verify returns data', async () => {
+      const expectedType = UserType.Customer
+      const expectedResponse = mock<HydratedDocument<IUser>>({ type: expectedType })
       mockUserService.prototype.verify.mockResolvedValue(expectedResponse)
       const expectedUser = { password: 'password', username: 'username' }
       const mockRequest = mock<Request>({ body: { password: expectedUser.password, username: expectedUser.username } })
-      const mockSendStatusFunc = jest.fn()
-      const mockResponse = mock<Response>({ sendStatus: mockSendStatusFunc })
+      const mockJsonFunc = jest.fn()
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: mockJsonFunc }) })
 
       await loginPost(mockRequest, mockResponse)
 
-      expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
-      expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 200)
+      expect(mockJsonFunc).toHaveBeenCalledTimes(1)
+      expect(mockJsonFunc).toHaveBeenNthCalledWith(1, { type: expectedType })
       expect(mockRequest.session.user).toEqual(expectedResponse)
     })
 

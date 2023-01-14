@@ -57,7 +57,7 @@ export default class ShoppingListService {
   async userHasPermissionOnList (user: IUser, listId: string): Promise<void> {
     const list = await ShoppingList.findById(listId)
     // If user is not the owner or is not an editor of the list
-    if (!(list?.ownerId === user._id || ((list?.editors.map(id => id.toString()).includes(user._id.toString())) ?? false))) {
+    if (!(list?.ownerId.toString() === user._id.toString() || ((list?.editors.map(id => id.toString()).includes(user._id.toString())) ?? false))) {
       throw new Api403Error('User does not have permission to use this list.')
     }
   }

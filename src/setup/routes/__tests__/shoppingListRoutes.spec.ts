@@ -63,17 +63,16 @@ describe('Shopping list routes (integration tests)', () => {
 
   describe('GET /get', () => {
     it('returns HTTP 200 and a given shopping list', async () => {
-      const mockUserId = new Types.ObjectId().toString()
       const item = await ShoppingList.create({
         created: currentTime,
-        ownerId: mockUserId
+        ownerId: fakeUser._id
       })
       const expectedObject = {
         _id: item._id.toString(),
         created: currentTime.toISOString(),
         editors: [],
         items: [],
-        ownerId: mockUserId,
+        ownerId: fakeUser.id,
         updated: currentTime.toISOString()
       }
       const response = await agent.get('/lists/get')

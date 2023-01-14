@@ -1,8 +1,8 @@
 import { HydratedDocument, Types } from 'mongoose'
 import { IShoppingList, ShoppingList } from '../../models/customer/ShoppingList'
-import { Api304Error, Api404Error } from '../../setup/exceptions'
+import { Api304Error, Api403Error, Api404Error } from '../../setup/exceptions'
 import { IShoppingListItem } from '../../models/customer/ShoppingListItem'
-import { User } from '../../models/User'
+import { IUser, User } from '../../models/User'
 
 export default class ShoppingListService {
   async new (ownerId: string): Promise<HydratedDocument<IShoppingList>> {
@@ -52,5 +52,13 @@ export default class ShoppingListService {
     }
     await list.save()
     return await ShoppingList.findById(listId)
+  }
+
+  async userHasPermissionOnList (user: IUser, listId: string): Promise<void> {
+    const list = await ShoppingList.findById(listId)
+    // If user is not the owner or is not an editor of the list
+    if (!(list?.ownerId.toString() === user._id.toString() || ((list?.editors.map(id => id.toString()).includes(user._id.toString())) ?? false))) {
+      throw new Api403Error('User does not have permission to use this list.')
+    }
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Request, Response } from 'express'
 import ShoppingListService from '../services/customer/ShoppingListService'
 import { mongoExcludeVersionToObjectOptions } from '../constants'
@@ -7,13 +8,13 @@ import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from '.
 const service = new ShoppingListService()
 
 const newPost = async (req: Request, res: Response): Promise<void> => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const result = await service.new(req.session.user!._id.toString())
   res.status(201).json(result.toObject(mongoExcludeVersionToObjectOptions))
 }
 
 const getListGet = async (req: Request<{}, {}, {}, { listId: string }>, res: Response): Promise<void> => {
   const { listId } = req.query
+  await service.userHasPermissionOnList(req.session.user!, listId)
   const result = await service.get(listId)
   if (result == null) {
     res.sendStatus(404)
@@ -33,6 +34,7 @@ const addEditorPatch = async (req: Request, res: Response): Promise<void> => {
     userId,
     listId
   } = req.body
+  await service.userHasPermissionOnList(req.session.user!, listId)
   await service.addEditor(userId, listId)
   res.status(204).send()
 }

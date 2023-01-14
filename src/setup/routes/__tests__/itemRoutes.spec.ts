@@ -1,10 +1,12 @@
-import supertest from 'supertest'
+import supertest, { SuperAgentTest } from 'supertest'
 import itemRoutes from '../itemRoutes'
 import { connect, connection, Types } from 'mongoose'
 import mongoUnit from 'mongo-unit'
 import bodyParser from 'body-parser'
-import express from 'express'
+import express, { Application, Request, Response } from 'express'
 import { Item } from '../../../models/staff/Item'
+import session from 'express-session'
+import { User, UserType } from '../../../models/User'
 
 beforeAll(async () => {
   await mongoUnit.start()
@@ -24,21 +26,38 @@ const unknownIdValidItemObject = {
   _id: expect.any(String)
 }
 
-const testApp = express()
-testApp.use(bodyParser.json({}))
-testApp.use('/items', itemRoutes)
+let testApp: Application
+let agent: SuperAgentTest
+const fakeUser = new User({
+  _id: new Types.ObjectId(),
+  password: 'pass',
+  type: UserType.Staff,
+  username: 'user'
+})
+
+beforeEach(async () => {
+  testApp = express()
+  testApp.use(bodyParser.json({}))
+  testApp.use(session({ secret: 'testSecret' }))
+  testApp.use('/items', itemRoutes)
+  testApp.get('/login', (req: Request, res: Response) => {
+    req.session.user = fakeUser
+    res.sendStatus(200)
+  })
+  agent = supertest.agent(testApp)
+  await agent.get('/login').send()
+}, 10000)
 
 describe('Item routes (integration tests)', () => {
   describe('POST /create', () => {
     it('create endpoint returns HTTP 201 and model value', async () => {
-      const request = supertest(testApp)
       const expectedObject = {
         barcode: 'barcode',
         name: 'name',
         position: 'position',
         stock: 0
       }
-      const response = await request.post('/items/create')
+      const response = await agent.post('/items/create')
         .type('form')
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
@@ -161,10 +180,9 @@ describe('Item routes (integration tests)', () => {
 
   describe('GET /list-all', () => {
     it('returns HTTP 200 and valid response with valid data', async () => {
-      const request = supertest(testApp)
       await Item.create(validItemObject)
 
-      const response = await request.get('/items/list-all')
+      const response = await agent.get('/items/list-all')
         .send()
 
       expect(response.status).toBe(200)
@@ -174,10 +192,9 @@ describe('Item routes (integration tests)', () => {
 
   describe('GET /find-barcode', () => {
     it('returns HTTP 200 and valid response with valid data', async () => {
-      const request = supertest(testApp)
       const expectedItem = await Item.create(validItemObject)
 
-      const response = await request.get('/items/find-barcode')
+      const response = await agent.get('/items/find-barcode')
         .query({ barcode: expectedItem.barcode })
         .send()
 
@@ -231,10 +248,9 @@ describe('Item routes (integration tests)', () => {
 
   describe('GET /find-name', () => {
     it('returns HTTP 200 and valid response with valid data', async () => {
-      const request = supertest(testApp)
       const expectedItem = await Item.create(validItemObject)
 
-      const response = await request.get('/items/find-name')
+      const response = await agent.get('/items/find-name')
         .query({ name: expectedItem.name })
         .send()
 

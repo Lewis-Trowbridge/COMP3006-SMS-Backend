@@ -64,7 +64,6 @@ describe('Shopping list routes (integration tests)', () => {
   describe('GET /get', () => {
     it('returns HTTP 200 and a given shopping list', async () => {
       const mockUserId = new Types.ObjectId().toString()
-      const request = supertest(testApp)
       const item = await ShoppingList.create({
         created: currentTime,
         ownerId: mockUserId
@@ -77,7 +76,7 @@ describe('Shopping list routes (integration tests)', () => {
         ownerId: mockUserId,
         updated: currentTime.toISOString()
       }
-      const response = await request.get('/lists/get')
+      const response = await agent.get('/lists/get')
         .query({ listId: item.id })
         .send()
 

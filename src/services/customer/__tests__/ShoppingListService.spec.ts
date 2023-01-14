@@ -249,7 +249,7 @@ describe('ShoppingListService', () => {
   describe('userHasPermissionOnList', () => {
     it('returns undefined when user is the owner of a given list', async () => {
       const mockUser = mock<IUser>({ _id: new Types.ObjectId() })
-      const mockList = await ShoppingList.create({ ownerId: mockUser._id })
+      const mockList = await ShoppingList.create({ editors: [], ownerId: mockUser._id })
       mockingoose(ShoppingList).toReturn(mockList, 'findOne')
       const service = new ShoppingListService()
       const result = await service.userHasPermissionOnList(mockUser, mockList.id)
@@ -258,7 +258,7 @@ describe('ShoppingListService', () => {
 
     it('returns undefined when user is an editor of a given list', async () => {
       const mockUser = mock<IUser>({ _id: new Types.ObjectId() })
-      const mockList = await ShoppingList.create({ editors: [mockUser._id] })
+      const mockList = await ShoppingList.create({ editors: [mockUser._id], ownerId: new Types.ObjectId() })
       mockingoose(ShoppingList).toReturn(mockList, 'findOne')
       const service = new ShoppingListService()
       const result = await service.userHasPermissionOnList(mockUser, mockList.id)
@@ -267,7 +267,7 @@ describe('ShoppingListService', () => {
 
     it('throws Api403Error when user is not authorised to use given list', async () => {
       const mockUser = mock<IUser>({ _id: new Types.ObjectId() })
-      const mockList = await ShoppingList.create({})
+      const mockList = await ShoppingList.create({ editors: [], ownerId: new Types.ObjectId() })
       mockingoose(ShoppingList).toReturn(mockList, 'findOne')
       const service = new ShoppingListService()
 

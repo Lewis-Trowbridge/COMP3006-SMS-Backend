@@ -15,6 +15,7 @@ import { resolveChangesSetupSocket } from './controllers/ShoppingListController'
 import { IUser } from './models/User'
 import session from 'express-session'
 import connectMongo from 'connect-mongodb-session'
+import { exceptionHandler } from './setup/handlers/exceptionHandler'
 
 // Add user info to Typescript config for session
 declare module 'express-session' {
@@ -55,6 +56,7 @@ app.use(session({
 app.use('/items', itemRoutes)
 app.use('/lists', shoppingListRoutes)
 app.use('/users', userRoutes)
+app.use(exceptionHandler)
 
 const server: http.Server = http.createServer(app)
 

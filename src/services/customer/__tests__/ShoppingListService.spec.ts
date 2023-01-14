@@ -2,10 +2,10 @@ import { ShoppingList } from '../../../models/customer/ShoppingList'
 import ShoppingListService from '../ShoppingListService'
 import { mongoExcludeIdsToObjectOptions } from '../../../constants'
 import { Types } from 'mongoose'
-import { Api304Error, Api404Error } from '../../../setup/exceptions'
+import { Api304Error, Api403Error, Api404Error } from '../../../setup/exceptions'
 import { IShoppingListItem } from '../../../models/customer/ShoppingListItem'
 import { mock } from 'jest-mock-extended'
-import { User, UserType } from '../../../models/User'
+import { IUser, User, UserType } from '../../../models/User'
 // Mockingoose does not work with ES6 imports: https://stackoverflow.com/questions/70156753/typeerror-0-mockingoose-default-is-not-a-function-mockingooose
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose')
@@ -243,6 +243,36 @@ describe('ShoppingListService', () => {
       await service.resolveChanges(fakeItem._id.toString(), [newChanges])
 
       expect(fakeItem.items[0]._id.toString()).not.toEqual('')
+    })
+  })
+
+  describe('userHasPermissionOnList', () => {
+    it('returns undefined when user is the owner of a given list', async () => {
+      const mockUser = mock<IUser>({ _id: new Types.ObjectId() })
+      const mockList = await ShoppingList.create({ ownerId: mockUser._id })
+      mockingoose(ShoppingList).toReturn(mockList, 'findOne')
+      const service = new ShoppingListService()
+      const result = await service.userHasPermissionOnList(mockUser, mockList.id)
+      expect(result).toBeUndefined()
+    })
+
+    it('returns undefined when user is an editor of a given list', async () => {
+      const mockUser = mock<IUser>({ _id: new Types.ObjectId() })
+      const mockList = await ShoppingList.create({ editors: [mockUser._id] })
+      mockingoose(ShoppingList).toReturn(mockList, 'findOne')
+      const service = new ShoppingListService()
+      const result = await service.userHasPermissionOnList(mockUser, mockList.id)
+      expect(result).toBeUndefined()
+    })
+
+    it('throws Api403Error when user is not authorised to use given list', async () => {
+      const mockUser = mock<IUser>({ _id: new Types.ObjectId() })
+      const mockList = await ShoppingList.create({})
+      mockingoose(ShoppingList).toReturn(mockList, 'findOne')
+      const service = new ShoppingListService()
+
+      await expect(async () => await service.userHasPermissionOnList(mockUser, mockList.id))
+        .rejects.toThrowError(new Api403Error('User does not have permission to use this list.'))
     })
   })
 })

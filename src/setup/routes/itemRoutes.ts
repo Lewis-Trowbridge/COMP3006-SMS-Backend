@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { createPost, findByBarcodeGet, findByNameGet, listAllGet } from '../../controllers/ItemController'
 import { body, query } from 'express-validator'
-import validateRequest from './validateRequest'
+import validateRequest from '../handlers/validateRequest'
 import { loggedInRequiredHandler, staffTypeRequiredHandler } from '../handlers/userTypeHandler'
 
 const router = Router()

@@ -1,10 +1,10 @@
-import supertest from 'supertest'
-import { connect, connection } from 'mongoose'
+import supertest, { SuperAgentTest } from 'supertest'
+import { connect, connection, Types } from 'mongoose'
 import mongoUnit from 'mongo-unit'
 import bodyParser from 'body-parser'
 // Import without using to patch Express
 import 'express-async-errors'
-import express from 'express'
+import express, { Application, Request, Response } from 'express'
 import userRoutes from '../userRoutes'
 import { User, UserType } from '../../../models/User'
 import session from 'express-session'
@@ -15,10 +15,27 @@ beforeAll(async () => {
   await connect(mongoUnit.getUrl())
 }, 30000)
 
-const testApp = express()
-testApp.use(bodyParser.json({}))
-testApp.use(session({ secret: 'testsecret' }))
-testApp.use('/users', userRoutes)
+let testApp: Application
+let agent: SuperAgentTest
+const fakeUser = new User({
+  _id: new Types.ObjectId(),
+  password: 'pass',
+  type: UserType.Customer,
+  username: 'user'
+})
+
+beforeEach(async () => {
+  testApp = express()
+  testApp.use(bodyParser.json({}))
+  testApp.use(session({ secret: 'testSecret' }))
+  testApp.use('/users', userRoutes)
+  testApp.get('/login', (req: Request, res: Response) => {
+    req.session.user = fakeUser
+    res.sendStatus(200)
+  })
+  agent = supertest.agent(testApp)
+  await agent.get('/login').send()
+}, 10000)
 
 describe('User routes (Integration test)', () => {
   describe('POST /create', () => {
@@ -68,11 +85,10 @@ describe('User routes (Integration test)', () => {
 
   describe('GET /search', () => {
     it('returns HTTP 200 and a list of usernames', async () => {
-      const request = supertest(testApp)
       const expectedUsername = 'user'
       await User.create({ password: 'password', type: UserType.Customer, username: expectedUsername })
 
-      const response = await request.get('/users/search')
+      const response = await agent.get('/users/search')
         .query({ name: expectedUsername })
         .send()
 

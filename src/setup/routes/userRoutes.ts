@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { createPost, loginPost, searchGet } from '../../controllers/UserController'
+import { customerTypeRequiredHandler, loggedInRequiredHandler } from '../handlers/userTypeHandler'
 
 const router = Router()
 
@@ -8,7 +9,8 @@ router.post('/create', createPost)
 
 router.post('/login', loginPost)
 
-router.get('/search', searchGet)
+router.get('/search', loggedInRequiredHandler, customerTypeRequiredHandler,
+  searchGet)
 
 /* eslint-enable @typescript-eslint/no-misused-promises */
 

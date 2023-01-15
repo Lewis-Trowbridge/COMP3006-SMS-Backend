@@ -2,7 +2,7 @@ import { mock } from 'jest-mock-extended'
 import { HydratedDocument } from 'mongoose'
 import { IUser, UserType } from '../../models/User'
 import UserService from '../../services/UserService'
-import { createPost, loginPost, searchGet } from '../UserController'
+import { createPost, loginPost, logoutGet, searchGet } from '../UserController'
 import { Request, Response } from 'express'
 import mocked = jest.mocked
 
@@ -82,6 +82,20 @@ describe('UserController', () => {
       expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
       expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 401)
       expect(mockRequest.session.user).toBeUndefined()
+    })
+  })
+
+  describe('logoutGet', () => {
+    it('sets the session user value to undefined', async () => {
+      const mockUser = mock<IUser>()
+      const mockRequest = mock<Request>({ session: { user: mockUser } })
+      const mockSendStatusFunc = jest.fn()
+      const mockResponse = mock<Response>({ sendStatus: mockSendStatusFunc })
+
+      await logoutGet(mockRequest, mockResponse)
+
+      expect(mockRequest.session.user).toBeUndefined()
+      expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 204)
     })
   })
 

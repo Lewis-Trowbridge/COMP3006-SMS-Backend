@@ -32,6 +32,11 @@ const loginPost = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
+const logoutGet = async (req: Request, res: Response): Promise<void> => {
+  req.session.user = undefined
+  res.sendStatus(204)
+}
+
 const searchGet = async (req: Request<{}, {}, {}, { name: string }>, res: Response): Promise<void> => {
   const result = await service.search(req.query.name)
   res.status(200).json(result)
@@ -40,5 +45,6 @@ const searchGet = async (req: Request<{}, {}, {}, { name: string }>, res: Respon
 export {
   createPost,
   loginPost,
+  logoutGet,
   searchGet
 }

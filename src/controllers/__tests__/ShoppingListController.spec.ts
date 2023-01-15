@@ -6,6 +6,7 @@ import { addEditorPatch, getListGet, listAllGet, newPost } from '../ShoppingList
 import { HydratedDocument, Types } from 'mongoose'
 import { IShoppingList } from '../../models/customer/ShoppingList'
 import { IUser } from 'src/models/User'
+import { Api404Error } from '../../setup/exceptions'
 
 jest.mock('../../services/customer/ShoppingListService')
 
@@ -69,18 +70,14 @@ describe('ShoppingListController', () => {
       expect(mockJsonFunc).toHaveBeenNthCalledWith(1, expectedResponse)
     })
 
-    it('returns null from ShoppingListService get', async () => {
+    it('throws exception if null returns from ShoppingListService get', async () => {
       const expectedResponse = null
       mockShoppingListService.prototype?.get.mockResolvedValue(expectedResponse)
       const mockListId = 'list'
       const mockRequest = mock<Request<{}, {}, {}, { listId: string }>>({ query: { listId: mockListId } })
-      const mockSendStatus = jest.fn().mockReturnValue({ send: jest.fn() })
-      const mockResponse = mock<Response>({ sendStatus: mockSendStatus })
+      const mockResponse = mock<Response>()
 
-      await getListGet(mockRequest, mockResponse)
-
-      expect(mockSendStatus).toHaveBeenCalledTimes(1)
-      expect(mockSendStatus).toHaveBeenNthCalledWith(1, 404)
+      await expect(async () => await getListGet(mockRequest, mockResponse)).rejects.toThrowError(new Api404Error())
     })
   })
 

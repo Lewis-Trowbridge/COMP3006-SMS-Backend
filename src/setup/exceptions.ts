@@ -10,6 +10,12 @@ class Api304Error extends ApiError {
   }
 }
 
+class Api401Error extends ApiError {
+  constructor (public message: string = 'Unauthorised.') {
+    super(message, 401)
+  }
+}
+
 class Api403Error extends ApiError {
   constructor (public message: string = 'Forbidden.') {
     super(message, 403)
@@ -25,6 +31,7 @@ class Api404Error extends ApiError {
 export {
   ApiError,
   Api304Error,
+  Api401Error,
   Api403Error,
   Api404Error
 }

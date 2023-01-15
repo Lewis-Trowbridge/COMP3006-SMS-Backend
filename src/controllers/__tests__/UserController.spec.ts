@@ -5,6 +5,7 @@ import UserService from '../../services/UserService'
 import { createPost, loginPost, logoutGet, searchGet } from '../UserController'
 import { Request, Response } from 'express'
 import mocked = jest.mocked
+import { Api304Error, Api401Error } from '../../setup/exceptions'
 
 jest.mock('../../services/UserService')
 
@@ -14,11 +15,10 @@ describe('UserController', () => {
   describe('create', () => {
     it('calls user service\'s "create" method', async () => {
       const expectedResponse = mock<HydratedDocument<IUser>>()
-      expectedResponse.toObject.mockReturnValue(expectedResponse)
       mockUserService.prototype.create.mockResolvedValue(expectedResponse)
       const expectedUser = { password: 'password', username: 'username' }
       const mockRequest = mock<Request>({ body: expectedUser })
-      const mockResponse = mock<Response>({ sendStatus: jest.fn() })
+      const mockResponse = mock<Response>({ status: jest.fn().mockReturnValue({ json: jest.fn() }) })
 
       await createPost(mockRequest, mockResponse)
 
@@ -41,17 +41,13 @@ describe('UserController', () => {
       expect(mockRequest.session.user).toEqual(expectedResponse)
     })
 
-    it('returns HTTP 304 when user service\'s "create" method throws', async () => {
+    it('throws Api304Error when user service\'s "create" method throws', async () => {
       mockUserService.prototype.create.mockRejectedValue(new Error())
       const expectedUser = { password: 'password', username: 'username' }
       const mockRequest = mock<Request>({ body: expectedUser })
-      const mockSendStatusFunc = jest.fn()
-      const mockResponse = mock<Response>({ sendStatus: mockSendStatusFunc })
+      const mockResponse = mock<Response>()
 
-      await createPost(mockRequest, mockResponse)
-
-      expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
-      expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 304)
+      await expect(async () => await createPost(mockRequest, mockResponse)).rejects.toThrowError(new Api304Error())
     })
   })
 
@@ -72,15 +68,13 @@ describe('UserController', () => {
       expect(mockRequest.session.user).toEqual(expectedResponse)
     })
 
-    it('returns HTTP 401 and does not store user data in session when verify returns null', async () => {
+    it('throws Api401Error and does not store user data in session when verify returns null', async () => {
       mockUserService.prototype.verify.mockResolvedValue(null)
       const expectedUser = { password: 'password', username: 'username' }
       const mockRequest = mock<Request>({ body: { password: expectedUser.password, username: expectedUser.username } })
-      const mockSendStatusFunc = jest.fn()
-      const mockResponse = mock<Response>({ sendStatus: mockSendStatusFunc })
-      await loginPost(mockRequest, mockResponse)
-      expect(mockSendStatusFunc).toHaveBeenCalledTimes(1)
-      expect(mockSendStatusFunc).toHaveBeenNthCalledWith(1, 401)
+      const mockResponse = mock<Response>()
+
+      await expect(async () => await loginPost(mockRequest, mockResponse)).rejects.toThrowError(new Api401Error())
       expect(mockRequest.session.user).toBeUndefined()
     })
   })

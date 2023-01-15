@@ -9,6 +9,7 @@ import userRoutes from '../userRoutes'
 import { User, UserType } from '../../../models/User'
 import session from 'express-session'
 import { hash } from 'argon2'
+import { exceptionHandler } from '../../../setup/handlers/exceptionHandler'
 
 beforeAll(async () => {
   await mongoUnit.start()
@@ -33,6 +34,7 @@ beforeEach(async () => {
     req.session.user = fakeUser
     res.sendStatus(200)
   })
+  testApp.use(exceptionHandler)
   agent = supertest.agent(testApp)
   await agent.get('/login').send()
 }, 10000)

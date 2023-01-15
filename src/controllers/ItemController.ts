@@ -1,6 +1,7 @@
 import ItemService from '../services/staff/ItemService'
 import { Request, Response } from 'express'
 import { mongoExcludeVersionToObjectOptions } from '../constants'
+import { Api404Error } from '../setup/exceptions'
 
 const service = new ItemService()
 
@@ -26,7 +27,7 @@ const findByBarcodeGet = async (req: Request<{}, {}, {}, { barcode: string }>, r
   if (model != null) {
     res.status(200).json(model.toObject(mongoExcludeVersionToObjectOptions))
   } else {
-    res.status(404)
+    throw new Api404Error()
   }
 }
 

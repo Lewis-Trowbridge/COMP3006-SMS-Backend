@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { Api304Error, Api401Error } from '../setup/exceptions'
 import { UserType } from '../models/User'
 import UserService from '../services/UserService'
 
@@ -11,10 +12,11 @@ const createPost = async (req: Request, res: Response): Promise<void> => {
   } = req.body
   try {
     const user = await service.create(username, password, UserType.Customer)
+    console.log(user)
     req.session.user = user
     res.status(201).json({ type: user.type })
   } catch {
-    res.sendStatus(304)
+    throw new Api304Error()
   }
 }
 
@@ -28,7 +30,7 @@ const loginPost = async (req: Request, res: Response): Promise<void> => {
     req.session.user = verified
     res.status(200).json({ type: verified.type })
   } else {
-    res.sendStatus(401)
+    throw new Api401Error()
   }
 }
 

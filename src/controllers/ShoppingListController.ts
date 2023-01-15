@@ -4,6 +4,16 @@ import ShoppingListService from '../services/customer/ShoppingListService'
 import { mongoExcludeVersionToObjectOptions } from '../constants'
 import { Socket } from 'socket.io'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from '../setup/socketEvents'
+import { IUser } from '../models/User'
+import { Types } from 'mongoose'
+
+interface IShoppingListReduced {
+  _id: string
+  editors: Types.ObjectId[]
+  ownerId: string
+  created: Date
+  updated: Date
+}
 
 const service = new ShoppingListService()
 
@@ -26,7 +36,20 @@ const getListGet = async (req: Request<{}, {}, {}, { listId: string }>, res: Res
 const listAllGet = async (req: Request, res: Response): Promise<void> => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const results = await service.listAll(req.session.user!._id.toString())
-  res.status(200).json(results.map(result => result.toObject(mongoExcludeVersionToObjectOptions)))
+  const resultsWithOwnerInfo = results.map(async (result) => await result.populate<{ ownerId: IUser }>('ownerId'))
+  const reducedResults = await Promise.all(resultsWithOwnerInfo.map(async (result) => {
+    const resultObject = (await result).toObject(mongoExcludeVersionToObjectOptions)
+    const reduced: IShoppingListReduced = {
+      _id: resultObject._id.toString(),
+      created: resultObject.created,
+      editors: resultObject.editors,
+      // TODO: Hack to get populated data
+      ownerId: (resultObject.ownerId as unknown as IUser).username,
+      updated: resultObject.updated
+    }
+    return reduced
+  }))
+  res.status(200).json(reducedResults)
 }
 
 const addEditorPatch = async (req: Request, res: Response): Promise<void> => {

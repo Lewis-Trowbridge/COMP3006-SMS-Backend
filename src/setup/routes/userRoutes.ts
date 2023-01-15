@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createPost, loginPost, searchGet } from '../../controllers/UserController'
+import { createPost, loginPost, logoutGet, searchGet } from '../../controllers/UserController'
 import { customerTypeRequiredHandler, loggedInRequiredHandler } from '../handlers/userTypeHandler'
 
 const router = Router()
@@ -8,6 +8,8 @@ const router = Router()
 router.post('/create', createPost)
 
 router.post('/login', loginPost)
+
+router.get('/logout', logoutGet)
 
 router.get('/search', loggedInRequiredHandler, customerTypeRequiredHandler,
   searchGet)

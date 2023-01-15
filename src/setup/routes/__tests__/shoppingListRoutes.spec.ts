@@ -9,6 +9,7 @@ import supertest, { SuperAgentTest } from 'supertest'
 import { ShoppingList } from '../../../models/customer/ShoppingList'
 import session from 'express-session'
 import { User, UserType } from '../../../models/User'
+import { exceptionHandler } from '../../../setup/handlers/exceptionHandler'
 
 const currentTime = new Date(2022, 1, 1)
 
@@ -38,6 +39,7 @@ beforeEach(async () => {
     req.session.user = fakeUser
     res.sendStatus(200)
   })
+  testApp.use(exceptionHandler)
   agent = supertest.agent(testApp)
   await agent.get('/login').send()
 }, 10000)

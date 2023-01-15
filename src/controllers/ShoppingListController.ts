@@ -4,6 +4,7 @@ import ShoppingListService from '../services/customer/ShoppingListService'
 import { mongoExcludeVersionToObjectOptions } from '../constants'
 import { Socket } from 'socket.io'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from '../setup/socketEvents'
+import { Api404Error } from '../setup/exceptions'
 
 const service = new ShoppingListService()
 
@@ -17,7 +18,7 @@ const getListGet = async (req: Request<{}, {}, {}, { listId: string }>, res: Res
   await service.userHasPermissionOnList(req.session.user!, listId)
   const result = await service.get(listId)
   if (result == null) {
-    res.sendStatus(404)
+    throw new Api404Error()
   } else {
     res.status(200).json(result.toObject(mongoExcludeVersionToObjectOptions))
   }

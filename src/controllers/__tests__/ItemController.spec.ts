@@ -5,6 +5,7 @@ import { mock } from 'jest-mock-extended'
 import { Request, Response } from 'express'
 import { HydratedDocument } from 'mongoose'
 import { IItem } from '../../models/staff/Item'
+import { Api404Error } from '../../setup/exceptions'
 
 jest.mock('../../services/staff/ItemService')
 
@@ -95,21 +96,15 @@ describe('ItemController', () => {
       expect(mockJsonFunc).toHaveBeenNthCalledWith(1, expectedResponse)
     })
 
-    it('returns 404 when a null value is returned from ItemService', async () => {
+    it('throws Api404Error when a null value is returned from ItemService', async () => {
       const expectedBarcode = 'barcode'
       const mockRequest = mock<Request<{}, {}, {}, { barcode: string }>>()
       mockRequest.query.barcode = expectedBarcode
       const expectedResponse = null
       mockItemService.prototype.findByBarcode.mockResolvedValue(expectedResponse)
-      const mockJsonFunc = jest.fn()
-      const mockStatusFunc = jest.fn().mockReturnValue({ json: mockJsonFunc })
-      const mockResponse = mock<Response>({ status: mockStatusFunc })
+      const mockResponse = mock<Response>()
 
-      await findByBarcodeGet(mockRequest, mockResponse)
-
-      expect(mockStatusFunc).toHaveBeenCalledTimes(1)
-      expect(mockStatusFunc).toHaveBeenNthCalledWith(1, 404)
-      expect(mockJsonFunc).toHaveBeenCalledTimes(0)
+      await expect(async () => await findByBarcodeGet(mockRequest, mockResponse)).rejects.toThrowError(new Api404Error())
     })
   })
   describe('findByNameGet', () => {

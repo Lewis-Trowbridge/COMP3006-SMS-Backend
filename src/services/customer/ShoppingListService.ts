@@ -38,10 +38,13 @@ export default class ShoppingListService {
     if (list == null) {
       return null
     }
-    for (const change of changes) {
-      if (change._id.toString() === '') {
-        change._id = new Types.ObjectId()
+    for (const item of list.items) {
+      // If the item's list ID does not appear in the changes
+      if (!(changes.some(change => change._id.toString() === item._id.toString()))) {
+        list.items.remove(item)
       }
+    }
+    for (const change of changes) {
       const item = list.items.find(item => item._id.toString() === change._id.toString())
       if (item === undefined) {
         list.items.push(change)

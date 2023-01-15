@@ -227,22 +227,22 @@ describe('ShoppingListService', () => {
       expect(fakeItem.items[1].toObject()).toEqual(newChanges)
     })
 
-    it('creates a new ObjectId when an empty id is given', async () => {
+    it('removes items not listed in the changes', async () => {
+      const oldItem: IShoppingListItem = {
+        _id: new Types.ObjectId(),
+        quantity: 1,
+        text: 'oldText'
+      }
       const fakeItem = await ShoppingList.create({
         created: new Date(),
+        items: [oldItem],
         ownerId: new Types.ObjectId().toString()
       })
       mockingoose(ShoppingList).toReturn(fakeItem, 'findOne')
-      const newChanges: IShoppingListItem = {
-        _id: mock<Types.ObjectId>({ toString: () => { return '' } }),
-        quantity: 2,
-        text: 'newText'
-      }
-
       const service = new ShoppingListService()
-      await service.resolveChanges(fakeItem._id.toString(), [newChanges])
+      await service.resolveChanges(fakeItem._id.toString(), [])
 
-      expect(fakeItem.items[0]._id.toString()).not.toEqual('')
+      expect(fakeItem.items).toHaveLength(0)
     })
   })
 

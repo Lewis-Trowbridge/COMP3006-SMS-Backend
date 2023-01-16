@@ -55,6 +55,19 @@ describe('ShoppingListService', () => {
       const actual = await service.listAll(testUserId)
       expect(actual.length).toBe(0)
     })
+
+    it('returns a list if the user is an editor', async () => {
+      const testUserId = 'user'
+      const expected = await ShoppingList.create({
+        editors: [testUserId]
+      })
+      mockingoose(ShoppingList).toReturn([expected], 'find')
+      const service = new ShoppingListService()
+      const actual = await service.listAll(testUserId)
+      expect(actual.length).toBe(1)
+      expect(actual[0].toObject())
+        .toEqual(expected.toObject())
+    })
   })
 
   describe('get', () => {

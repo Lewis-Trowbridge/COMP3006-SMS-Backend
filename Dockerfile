@@ -2,8 +2,8 @@ FROM node:16
 
 COPY . .
 
-RUN [ "yarn", "install", "--frozen-lockfile" ]
+RUN [ "npm", "ci", "--force" ]
 
-RUN [ "yarn", "build" ]
+RUN [ "npm", "run", "build" ]
 
-ENTRYPOINT [ "yarn", "serve" ]
+ENTRYPOINT [ "npm", "run", "serve" ]

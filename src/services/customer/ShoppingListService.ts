@@ -13,8 +13,8 @@ export default class ShoppingListService {
     return await ShoppingList.findById(listId)
   }
 
-  async listAll (ownerId: string): Promise<Array<HydratedDocument<IShoppingList>>> {
-    return await ShoppingList.find({ ownerId })
+  async listAll (userId: string): Promise<Array<HydratedDocument<IShoppingList>>> {
+    return await ShoppingList.find({ $or: [{ ownerId: userId }, { editors: userId }] })
   }
 
   async addEditor (username: string, listId: Types.ObjectId): Promise<void> {

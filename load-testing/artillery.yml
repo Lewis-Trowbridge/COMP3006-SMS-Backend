@@ -1,0 +1,28 @@
+config:
+  plugins:
+      uuid:
+        vars: [ 'username' , 'password' ]
+  target: "http://localhost:9000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: Warm up
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 60
+      arrivalRate: 50
+      name: Sustained load
+
+scenarios:
+  - name: Login
+    flow:
+      - options:
+          url: '/'
+          beforeRequest: addUUID
+      - post:
+          url: /users/create
+          json:
+            username: "{{ username }}"
+            password: "{{ password }}"

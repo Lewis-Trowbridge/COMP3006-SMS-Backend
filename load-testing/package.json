@@ -1,0 +1,15 @@
+{
+  "name": "load-testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "artillery run artillery.yml"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "artillery": "^2.0.0-27",
+    "artillery-plugin-uuid": "^0.0.1"
+  }
+}

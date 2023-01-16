@@ -1,0 +1,20 @@
+name: Load test
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies (server)
+        run: npm ci --force
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.8.0
+        with:
+          mongodb-version: 5.13
+      - name: Start server
+        run: npm run start &
+      - name: Install dependencies (Artillery)
+        run: cd load-testing && npm ci --force
+      - name: Run Artillery tests
+        run: npm run test

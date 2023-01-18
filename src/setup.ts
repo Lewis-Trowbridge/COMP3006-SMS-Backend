@@ -31,6 +31,8 @@ if (sessionSecret === undefined) {
   throw new Error('SessionSecret environment variable not set.')
 }
 
+console.log('NODE_ENV:', process.env.NODE_ENV)
+
 const cookieOptions: CookieOptions = {
   // Set age to 1 hour
   maxAge: 1000 * 60 * 60,

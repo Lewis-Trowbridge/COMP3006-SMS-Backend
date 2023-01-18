@@ -32,12 +32,13 @@ if (sessionSecret === undefined) {
 }
 
 console.log('NODE_ENV:', process.env.NODE_ENV)
+const isProduction = process.env.NODE_ENV === 'production'
 
 const cookieOptions: CookieOptions = {
   // Set age to 1 hour
   maxAge: 1000 * 60 * 60,
-  sameSite: 'none',
-  secure: process.env.NODE_ENV === 'production'
+  sameSite: isProduction ? 'none' : 'lax',
+  secure: isProduction
 }
 
 const mongoStore = new MongoStore({
@@ -53,7 +54,7 @@ app.use(cors({
 app.use(bodyParser.json({}))
 app.use(session({
   cookie: cookieOptions,
-  proxy: process.env.NODE_ENV === 'production',
+  proxy: isProduction,
   resave: true,
   saveUninitialized: true,
   secret: sessionSecret,

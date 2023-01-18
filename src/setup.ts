@@ -53,6 +53,7 @@ app.use(cors({
 app.use(bodyParser.json({}))
 app.use(session({
   cookie: cookieOptions,
+  proxy: process.env.NODE_ENV === 'production',
   resave: true,
   saveUninitialized: true,
   secret: sessionSecret,

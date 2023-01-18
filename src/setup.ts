@@ -13,7 +13,7 @@ import shoppingListRoutes from './setup/routes/shoppingListRoutes'
 import userRoutes from './setup/routes/userRoutes'
 import { resolveChangesSetupSocket } from './controllers/ShoppingListController'
 import { IUser } from './models/User'
-import session from 'express-session'
+import session, { CookieOptions } from 'express-session'
 import connectMongo from 'connect-mongodb-session'
 import { exceptionHandler } from './setup/handlers/exceptionHandler'
 
@@ -31,6 +31,13 @@ if (sessionSecret === undefined) {
   throw new Error('SessionSecret environment variable not set.')
 }
 
+const cookieOptions: CookieOptions = {
+  // Set age to 1 hour
+  maxAge: 1000 * 60 * 60,
+  sameSite: true,
+  secure: process.env.NODE_ENV === 'production'
+}
+
 const mongoStore = new MongoStore({
   collection: 'sessions',
   uri: URLS.MONGO
@@ -43,10 +50,7 @@ app.use(cors({
 }))
 app.use(bodyParser.json({}))
 app.use(session({
-  cookie: {
-    // Set age to 1 hour
-    maxAge: 1000 * 60 * 60
-  },
+  cookie: cookieOptions,
   resave: true,
   saveUninitialized: true,
   secret: sessionSecret,

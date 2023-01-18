@@ -34,7 +34,6 @@ if (sessionSecret === undefined) {
 const cookieOptions: CookieOptions = {
   // Set age to 1 hour
   maxAge: 1000 * 60 * 60,
-  sameSite: true,
   secure: process.env.NODE_ENV === 'production'
 }
 

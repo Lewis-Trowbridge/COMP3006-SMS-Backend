@@ -66,6 +66,32 @@ describe('User routes (Integration test)', () => {
 
       expect(response.statusCode).toBe(304)
     }, 10000)
+
+    it('returns HTTP 400 when given empty username and password', async () => {
+      const request = supertest(testApp)
+      const expectedError = {
+        errors: [
+          {
+            location: 'body',
+            msg: 'Invalid value',
+            param: 'username'
+          },
+          {
+            location: 'body',
+            msg: 'Invalid value',
+            param: 'password'
+          }
+        ]
+      }
+      const response = await request.post('/users/create')
+        .type('form')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .send()
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(expectedError)
+    }, 10000)
   })
 
   describe('POST /login', () => {
@@ -83,6 +109,32 @@ describe('User routes (Integration test)', () => {
       expect(response.body).toEqual({ type: existingUser.type })
       expect(response.headers['set-cookie']).toHaveLength(1)
     }, 10000)
+
+    it('returns HTTP 400 when given empty username and password', async () => {
+      const request = supertest(testApp)
+      const expectedError = {
+        errors: [
+          {
+            location: 'body',
+            msg: 'Invalid value',
+            param: 'username'
+          },
+          {
+            location: 'body',
+            msg: 'Invalid value',
+            param: 'password'
+          }
+        ]
+      }
+      const response = await request.post('/users/login')
+        .type('form')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .send()
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(expectedError)
+    }, 10000)
   })
 
   describe('GET /search', () => {
@@ -97,6 +149,23 @@ describe('User routes (Integration test)', () => {
       expect(response.statusCode).toBe(200)
       expect(response.body).toEqual([expectedUsername])
     })
+
+    it('returns HTTP 400 when given empty name', async () => {
+      const expectedError = {
+        errors: [
+          {
+            location: 'query',
+            msg: 'Invalid value',
+            param: 'name'
+          }
+        ]
+      }
+      const response = await agent.get('/users/search')
+        .send()
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(expectedError)
+    }, 10000)
   })
 })
 
